@@ -3,19 +3,42 @@ import React from 'react'
 import FolderList from './FolderList'
 import './style.css'
 
-function injectUI() {
-  const sidebar = document.querySelector("late-load-sidebar-items");
-  if (!sidebar) return;
+console.log("Extensión para ChatGPT cargada correctamente");
 
-  if (document.getElementById("gpt-folder-list")) return;
+function waitForElement(selector, timeout = 10000) {
+  return new Promise((resolve, reject) => {
+    const interval = 100;
+    let elapsed = 0;
 
-  const container = document.createElement("div");
-  container.id = "gpt-folder-list";
-  container.className = "mb-2 p-2 border-b border-gray-700";
-  sidebar.prepend(container);
-
-  const root = createRoot(container);
-  root.render(<FolderList />);
+    const checkExist = setInterval(() => {
+      const element = document.querySelector(selector);
+      if (element) {
+        clearInterval(checkExist);
+        resolve(element);
+      } else if (elapsed >= timeout) {
+        clearInterval(checkExist);
+        reject(new Error(`Element ${selector} not found after ${timeout}ms`));
+      }
+      elapsed += interval;
+    }, interval);
+  });
 }
 
-injectUI();
+(async () => {
+  try {
+    const target = await waitForElement('#late-load-sidebar-items');
+    const history = await waitForElement('#history');
+
+    const container = document.createElement('div');
+    container.id = 'gpt-organizer-folderlist-root';
+
+    // Evita inyecciones múltiples si recargas el script
+    if (!document.querySelector('#gpt-organizer-folderlist-root')) {
+      target.insertBefore(container, history);
+      const root = createRoot(container);
+      root.render(<FolderList />);
+    }
+  } catch (error) {
+    console.error('GPT Organizer: Failed to inject FolderList', error);
+  }
+})();

@@ -3,10 +3,10 @@
   "name": "GPT Organizer",
   "version": "0.0.1",
   "description": "Organiza tus chats de ChatGPT en carpetas",
-  "host_permissions": ["https://chat.openai.com/*"],
+  "host_permissions": ["https://chatgpt.com/*"],
   "content_scripts": [
     {
-      "matches": ["https://chat.openai.com/*"],
+      "matches": ["https://chatgpt.com/*"],
       "js": ["assets/content.js"]
     }
   ],
