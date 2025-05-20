@@ -3,8 +3,6 @@ import React from 'react'
 import FolderList from './FolderList'
 import './style.css'
 
-console.log("Extensión para ChatGPT cargada correctamente");
-
 function waitForElement(selector, timeout = 10000) {
   return new Promise((resolve, reject) => {
     const interval = 100;
