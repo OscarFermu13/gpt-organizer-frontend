@@ -76,14 +76,15 @@ export default function FolderList() {
       <h6 className="text-xs font-semibold mb-4">Carpetas</h6>
       <ul className="space-y-2">
         {folders.map((folder) => (
-          <li key={folder.id} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-200 rounded p-2">
+          <li key={folder.id} 
+            className="hover:bg-gray-200 flex items-center space-x-2 cursor-pointer rounded p-2">
             <span className="w-3 h-3 rounded-full" style={{ backgroundColor: folder.color || '#FFFFFF' }}></span>
             <span className="text-sm">{folder.name}</span>
           </li>
         ))}
         <li
           onClick={() => setShowModal(true)}
-          className="flex items-center space-x-2 cursor-pointer hover:bg-gray-200 rounded p-2"
+          className="hover:bg-gray-200 flex items-center space-x-2 cursor-pointer rounded p-2"
         >
           <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FFFFFF' }}></span>
           <span className="text-sm">Crear carpeta</span>
@@ -95,7 +96,8 @@ export default function FolderList() {
         <div 
         className="fixed inset-0 bg-black/90 flex justify-center items-center z-50"
           onClick={() => setShowModal(false)}>
-          <div className="bg-gray-800 text-white rounded-lg p-6 w-80 shadow-lg space-y-4"
+          <div 
+            className="bg-gray-800 text-white rounded-lg p-6 w-80 shadow-lg space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-lg font-bold">Nueva carpeta</h2>
