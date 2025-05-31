@@ -7,7 +7,11 @@ const ListFoldersModal = ({ onClose }) => {
 
     const API_URL_FOLDER = 'http://localhost:4000/folders';
     const API_URL_CHAT = 'http://localhost:4000/chats';
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWF2M3Y2NmkwMDAwMXkzYWY1NmtpbDU5IiwiaWF0IjoxNzQ3NjYwMzc4LCJleHAiOjE3NDgyNjUxNzh9.Al6j78lkcJD33r9cZuRTq5tFKsiRH3pTpk9zdnswegk';
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWJjMDR3MnAwMDAwMXlrcDEyNzJsYWlrIiwiaWF0IjoxNzQ4NjgyMTkxLCJleHAiOjE3NDkyODY5OTF9.JHrZvsvQuZEv-gjWNdFrEHwnmZXqNf2KaggYm8FQmvo';
+
+    const chatHref = sessionStorage.getItem("lastChatHref");
+    const chatId = chatHref?.split("/c/")[1] ?? null;
+    const chatTitle = sessionStorage.getItem("lastChatTitle") || "Chat sin título";
 
     useEffect(() => {
         async function fetchFolders() {
@@ -33,24 +37,28 @@ const ListFoldersModal = ({ onClose }) => {
 
     const handleFolderClick = async (folderId) => {
         try {
-            const res = await fetch(API_URL_CHAT, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    folderId: folderId,
-                    favorite: true,
-                    chatId: 'GPT Organizer v2',
-                }),
-            });
+            if (chatId) {
+                const res = await fetch(API_URL_CHAT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        folderId: folderId,
+                        favorite: true,
+                        chatId: chatId,
+                        title: chatTitle,
+                    }),
+                });
 
-            if (!res.ok) throw new Error(`Error: ${res.status}`);
+                if (!res.ok) throw new Error(`Error: ${res.status}`);
 
-            const data = await res.json();
-            console.log('Chat añadido a la carpeta correctamente: ', data);
-            onClose();
+                const data = await res.json();
+                console.log('Chat añadido a la carpeta correctamente: ', data);
+                window.dispatchEvent(new CustomEvent('folderUpdated'));
+                onClose();
+            }
         } catch (error) {
             console.error('Error al añadir el chat a la carpeta: ', error);
         }
@@ -69,35 +77,40 @@ const ListFoldersModal = ({ onClose }) => {
 
     const modalContent = (
         <div
-            className="fixed inset-0 bg-black/90 flex justify-center items-center z-50"
+            className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80"
             onClick={() => onClose()}
         >
             <div
-                className="bg-gray-800 text-white rounded-lg p-6 w-80 shadow-lg space-y-4"
+                className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]"
                 onClick={(e) => e.stopPropagation()}
             >
-                <h2 className="text-lg font-semibold mb-4">Carpetas</h2>
-                {loading ? (
-                    <p className="text-sm text-gray-500">Cargando...</p>
-                ) : (
-                    <ul className="space-y-2 max-h-60 overflow-y-auto">
-                        {folders.map(folder => (
-                            <li 
-                                key={folder.id} 
-                                className="p-2 bg-gray-800 rounded hover:bg-gray-200"
-                                onClick={() => handleFolderClick(folder.id)}
-                            >
-                                {folder.name}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-                <button
-                    onClick={() => onClose()}
-                    className="text-sm px-3 py-1 rounded border border-gray-300"
+                <div
+                    className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
+                    onClick={(e) => e.stopPropagation()}
                 >
-                    Cerrar
-                </button>
+                    <h2 className="text-lg font-semibold mb-4">Carpetas</h2>
+                    {loading ? (
+                        <p className="text-sm text-gray-500">Cargando...</p>
+                    ) : (
+                        <ul className="mt-2 flex flex-wrap gap-x-1 gap-y-2">
+                            {folders.map(folder => (
+                                <li
+                                    key={folder.id}
+                                    className="btn relative btn-secondary btn-small text-token-text-secondary py-2 ps-2 pe-3 text-md font-normal"
+                                    onClick={() => handleFolderClick(folder.id)}
+                                >
+                                    {folder.name}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                    <button
+                        onClick={() => onClose()}
+                        className="btn relative btn-secondary"
+                    >
+                        Cerrar
+                    </button>
+                </div>
             </div>
         </div>
     );

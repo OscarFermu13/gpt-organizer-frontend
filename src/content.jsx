@@ -46,7 +46,7 @@ function observeMenuOpen() {
 
 (async () => {
   try {
-    const target = await waitForElement('#late-load-sidebar-items');
+    //const target = await waitForElement('#late-load-sidebar-items');
     const history = await waitForElement('#history');
 
     const container = document.createElement('div');
@@ -54,7 +54,8 @@ function observeMenuOpen() {
 
     // Evita inyecciones múltiples si recargas el script
     if (!document.querySelector('#gpt-organizer-folderlist-root')) {
-      target.insertBefore(container, history);
+      //target.insertBefore(container, history);
+      history.prepend(container);
       const root = createRoot(container);
       root.render(<FolderList />);
       observeMenuOpen();
@@ -63,3 +64,62 @@ function observeMenuOpen() {
     console.error('GPT Organizer: Failed to inject FolderList', error);
   }
 })();
+
+// Extraer el href del menú
+
+function getThreeDotsButtons() {
+  return document.querySelectorAll('button[data-testid$="-options"]');
+}
+
+function findClosestHrefAndTitle(element) {
+  if (!element) return { href: null, title: null };
+
+  let current = element;
+  while (current && current !== document.body) {
+    if (current.tagName === "A" && current.href) {
+      const titleSpan = current.querySelector("span");
+      const title = titleSpan ? titleSpan.textContent.trim() : null;
+      return { href: current.href, title };
+    }
+
+    const innerLink = current.querySelector("a[href]");
+    if (innerLink) {
+      const titleSpan = innerLink.querySelector("span");
+      const title = titleSpan ? titleSpan.textContent.trim() : null;
+      return { href: innerLink.href, title };
+    }
+
+    current = current.parentElement;
+  }
+
+  return { href: null, title: null };
+}
+
+function attachListenersToThreeDotsButtons() {
+  const buttons = getThreeDotsButtons();
+
+  buttons.forEach((btn) => {
+    if (!btn.dataset.listenerAttached) {
+      btn.dataset.listenerAttached = "true";
+
+      btn.addEventListener("click", () => {
+        const { href, title } = findClosestHrefAndTitle(btn);
+        if (href) {
+          console.log("📎 Chat href guardado:", href);
+          console.log("📝 Chat título guardado:", title);
+          sessionStorage.setItem("lastChatHref", href);
+          sessionStorage.setItem("lastChatTitle", title || "");
+        }
+      });
+    }
+  });
+}
+
+// Observar DOM dinámico
+const observer = new MutationObserver(() => {
+  attachListenersToThreeDotsButtons();
+});
+observer.observe(document.body, { childList: true, subtree: true });
+
+// Run once at load
+attachListenersToThreeDotsButtons();
