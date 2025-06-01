@@ -89,6 +89,7 @@ const ListFoldersModal = ({ onClose }) => {
                     onClick={(e) => e.stopPropagation()}
                 >
                     <h2 className="text-lg font-semibold mb-4">Carpetas</h2>
+                    
                     {loading ? (
                         <p className="text-sm text-gray-500">Cargando...</p>
                     ) : (
@@ -106,7 +107,7 @@ const ListFoldersModal = ({ onClose }) => {
                     )}
                     <button
                         onClick={() => onClose()}
-                        className="btn relative btn-secondary"
+                        className="btn relative btn-secondary mt-4"
                     >
                         Cerrar
                     </button>
