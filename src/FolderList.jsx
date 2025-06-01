@@ -10,9 +10,12 @@ export default function FolderList() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [newFolderColor, setNewFolderColor] = useState('#888888');
-  const [showRenameModal, setShowRenameModal] = useState(false);
-  const [renameValue, setRenameValue] = useState('');
+  const [showRenameFolderModal, setShowRenameFolderModal] = useState(false);
+  const [renameFolderValue, setRenameFolderValue] = useState('');
   const [showNewParentModal, setShowNewParentModal] = useState(false);
+  const [showRenameChatModal, setShowRenameChatModal] = useState(false);
+  const [renameChatValue, setRenameChatValue] = useState('');
+  const [showMoveChatModal, setShowMoveChatModal] = useState(false);
 
   const [contextMenu, setContextMenu] = useState(null);
 
@@ -113,7 +116,7 @@ export default function FolderList() {
 
       setFolders(folders.map(f => f.id === id ? updatedFolder : f));
       closeContextMenu();
-      setShowRenameModal(false)
+      setShowRenameFolderModal(false)
     } catch (err) {
       console.error(err);
     }
@@ -138,7 +141,6 @@ export default function FolderList() {
       });
 
       if (!res.ok) throw new Error('Error al añadir carpeta padre');
-      const newFolder = await res.json();
 
       window.dispatchEvent(new CustomEvent('folderUpdated'));
       closeContextMenu();
@@ -161,6 +163,48 @@ export default function FolderList() {
 
       setFolders(folders.filter(f => f.id !== id));
       closeContextMenu();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function renameChat(id, newTitle) {
+    try {
+      const res = await fetch(`${API_URL_CHAT}/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title: newTitle }),
+      });
+
+      if (!res.ok) throw new Error('Error al renombrar el chat');
+      
+      window.dispatchEvent(new CustomEvent('folderUpdated'));
+      closeContextMenu();
+      setShowRenameChatModal(false)
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function moveChat(id, folderId) {
+    try {
+      const res = await fetch(`${API_URL_CHAT}/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ folderId: folderId }),
+      });
+
+      if (!res.ok) throw new Error('Error al mover el chat a la nueva carpeta');
+
+      window.dispatchEvent(new CustomEvent('folderUpdated'));
+      closeContextMenu();
+      setShowMoveChatModal(false);
     } catch (err) {
       console.error(err);
     }
@@ -365,8 +409,8 @@ export default function FolderList() {
               <div
                 className="group __menu-item pe-8 gap-1.5"
                 onClick={() => {
-                  setRenameValue(contextMenu.data.name);
-                  setShowRenameModal(true);
+                  setRenameFolderValue(contextMenu.data.name);
+                  setShowRenameFolderModal(true);
                 }}
               >
                 <div className="flex items-center justify-center h-4 w-4">
@@ -414,6 +458,35 @@ export default function FolderList() {
             >
               <div
                 className="group __menu-item pe-8 gap-1.5"
+                onClick={() => {
+                  setRenameChatValue(contextMenu.data.name);
+                  setShowRenameChatModal(true);
+                }}
+              >
+                <div className="flex items-center justify-center h-4 w-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                  </svg>
+                </div>
+                <span>Cambiar nombre</span>
+              </div>
+
+              <div
+                className="group __menu-item pe-8 gap-1.5"
+                onClick={() => setShowMoveChatModal(true)}
+              >
+                <div className="flex items-center justify-center h-4 w-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                  </svg>
+                </div>
+                <span>Mover</span>
+              </div>
+
+              <div className='h-px bg-gray-700 my-1 mx-4'></div>
+
+              <div
+                className="group __menu-item pe-8 gap-1.5"
                 data-color="danger"
                 onClick={() => deleteChat(contextMenu.data.id)}
               >
@@ -429,27 +502,27 @@ export default function FolderList() {
         </div>
       )}
 
-      {showRenameModal && (
+      {showRenameFolderModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white dark:bg-[#353535] p-6 rounded-xl shadow-xl max-w-sm w-full">
             <h2 className="text-lg font-semibold mb-4">Cambiar nombre</h2>
             <input
               type="text"
               className="w-full p-2 rounded border mb-4 text-black"
-              placeholder={renameValue}
-              onChange={(e) => setRenameValue(e.target.value)}
+              placeholder={renameFolderValue}
+              onChange={(e) => setRenameFolderValue(e.target.value)}
             />
             <div className="flex justify-end gap-2">
               <button
                 className="px-4 py-2 rounded bg-gray-300 text-black"
-                onClick={() => setShowRenameModal(false)}
+                onClick={() => setShowRenameFolderModal(false)}
               >
                 Cancelar
               </button>
               <button
                 className="px-4 py-2 rounded bg-blue-600 text-white"
                 onClick={async () => {
-                  await renameFolder(contextMenu.data.id, renameValue)
+                  await renameFolder(contextMenu.data.id, renameFolderValue)
                 }}
               >
                 Guardar
@@ -481,6 +554,67 @@ export default function FolderList() {
                 <button
                   className="btn relative btn-secondary mt-4"
                   onClick={() => setShowNewParentModal(false)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRenameChatModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-[#353535] p-6 rounded-xl shadow-xl max-w-sm w-full">
+            <h2 className="text-lg font-semibold mb-4">Cambiar nombre</h2>
+            <input
+              type="text"
+              className="w-full p-2 rounded border mb-4 text-black"
+              placeholder={renameChatValue}
+              onChange={(e) => setRenameChatValue(e.target.value)}
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 rounded bg-gray-300 text-black"
+                onClick={() => setShowRenameChatModal(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-blue-600 text-white"
+                onClick={async () => {
+                  await renameChat(contextMenu.data.id, renameChatValue)
+                }}
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showMoveChatModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80">
+          <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
+            <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
+              <h2 className="text-lg font-semibold mb-4">Mover carpeta</h2>
+
+              <ul className="mt-2 flex flex-wrap gap-x-1 gap-y-2">
+                {folders.map(folder => (
+                  <li
+                    key={folder.id}
+                    className="btn relative btn-secondary btn-small text-token-text-secondary py-2 ps-2 pe-3 text-md font-normal"
+                    onClick={() => moveChat(contextMenu.data.id, folder.id)}
+                  >
+                    {folder.name}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  className="btn relative btn-secondary mt-4"
+                  onClick={() => setShowMoveChatModal(false)}
                 >
                   Cancelar
                 </button>
