@@ -321,7 +321,7 @@ export default function FolderList() {
     );
   };
 
-  if (loading) return <div className="text-white text-sm">Cargando carpetas...</div>;
+  if (loading) return <div className="m-2 text-white text-sm">Cargando carpetas...</div>;
 
   const folderTree = buildFolderTree(folders);
 

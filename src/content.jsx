@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client'
 import React from 'react'
 import FolderList from './FolderList'
 import CreateButton from './CreateButton';
+import AuthPanel from './AuthPanel';
 import './style.css'
 
 function waitForElement(selector, timeout = 10000) {
@@ -58,6 +59,7 @@ function observeMenuOpen() {
       history.prepend(container);
       const root = createRoot(container);
       root.render(<FolderList />);
+      root.render(<AuthPanel />);
       observeMenuOpen();
     }
   } catch (error) {
@@ -105,8 +107,6 @@ function attachListenersToThreeDotsButtons() {
       btn.addEventListener("click", () => {
         const { href, title } = findClosestHrefAndTitle(btn);
         if (href) {
-          console.log("📎 Chat href guardado:", href);
-          console.log("📝 Chat título guardado:", title);
           sessionStorage.setItem("lastChatHref", href);
           sessionStorage.setItem("lastChatTitle", title || "");
         }
