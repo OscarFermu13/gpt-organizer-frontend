@@ -15,7 +15,7 @@ const CreateButton = () => {
 
   return (
     <div
-      className="hover:bg-gray-200 can-hover:cursor-pointer rounded-10 w-full flex items-center space-x-2 py-1"
+      className="hover:bg-gray-400 group  gap-1.5 w-full flex items-center"
       role="menuitem"
       onClick={handleClick}
     >
