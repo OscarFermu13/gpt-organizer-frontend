@@ -115,6 +115,7 @@ export default function FolderList() {
       const updatedFolder = await res.json();
 
       setFolders(folders.map(f => f.id === id ? updatedFolder : f));
+      window.dispatchEvent(new CustomEvent('folderUpdated'));
       closeContextMenu();
       setShowRenameFolderModal(false)
     } catch (err) {
@@ -180,7 +181,7 @@ export default function FolderList() {
       });
 
       if (!res.ok) throw new Error('Error al renombrar el chat');
-      
+
       window.dispatchEvent(new CustomEvent('folderUpdated'));
       closeContextMenu();
       setShowRenameChatModal(false)
@@ -275,12 +276,12 @@ export default function FolderList() {
           style={{ paddingLeft: `${depth * 16}px` }}
           onClick={() => toggleFolder(folder.id)}
         >
-          <div className="pl-2 justyfy-start flex items-center gap-2">
+          <div className="pl-2 justyfy-start flex items-center gap-2 truncate">
             <svg width="16" height="16" viewBox="0 0 24 24" style={{ fill: folder.color || '#FFFFFF' }}>
               <path d="M19.906 9c.382 0 .749.057 1.094.162V9a3 3 0 0 0-3-3h-3.879a.75.75 0 0 1-.53-.22L11.47 3.66A2.25 2.25 0 0 0 9.879 3H6a3 3 0 0 0-3 3v3.162A3.756 3.756 0 0 1 4.094 9h15.812ZM4.094 10.5a2.25 2.25 0 0 0-2.227 2.568l.857 6A2.25 2.25 0 0 0 4.951 21H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-2.227-2.568H4.094Z" />
             </svg>
             <div className="truncate">
-              <span className="text-sm">{folder.name}</span>
+              <span className="text-sm truncate">{folder.name}</span>
             </div>
           </div>
           <button
@@ -459,7 +460,7 @@ export default function FolderList() {
               <div
                 className="group __menu-item pe-8 gap-1.5"
                 onClick={() => {
-                  setRenameChatValue(contextMenu.data.name);
+                  setRenameChatValue(contextMenu.data.title);
                   setShowRenameChatModal(true);
                 }}
               >
@@ -503,30 +504,32 @@ export default function FolderList() {
       )}
 
       {showRenameFolderModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-[#353535] p-6 rounded-xl shadow-xl max-w-sm w-full">
-            <h2 className="text-lg font-semibold mb-4">Cambiar nombre</h2>
-            <input
-              type="text"
-              className="w-full p-2 rounded border mb-4 text-black"
-              placeholder={renameFolderValue}
-              onChange={(e) => setRenameFolderValue(e.target.value)}
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 rounded bg-gray-300 text-black"
-                onClick={() => setShowRenameFolderModal(false)}
-              >
-                Cancelar
-              </button>
-              <button
-                className="px-4 py-2 rounded bg-blue-600 text-white"
-                onClick={async () => {
-                  await renameFolder(contextMenu.data.id, renameFolderValue)
-                }}
-              >
-                Guardar
-              </button>
+        <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80">
+          <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
+            <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
+              <h2 className="text-lg font-semibold mb-4">Cambiar nombre</h2>
+              <input
+                type="text"
+                className="bg-token-main-surface-primary w-full resize-none focus:ring-transparent rounded-lg border text-sm focus-token-border-heavy border-token-border-default placeholder:text-gray-400 placeholder:text-gray-300"
+                placeholder={renameFolderValue}
+                onChange={(e) => setRenameFolderValue(e.target.value)}
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  className="btn relative btn-secondary mt-4"
+                  onClick={() => setShowRenameFolderModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn relative btn-primary mt-4"
+                  onClick={async () => {
+                    await renameFolder(contextMenu.data.id, renameFolderValue)
+                  }}
+                >
+                  Guardar
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -564,30 +567,32 @@ export default function FolderList() {
       )}
 
       {showRenameChatModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-[#353535] p-6 rounded-xl shadow-xl max-w-sm w-full">
-            <h2 className="text-lg font-semibold mb-4">Cambiar nombre</h2>
-            <input
-              type="text"
-              className="w-full p-2 rounded border mb-4 text-black"
-              placeholder={renameChatValue}
-              onChange={(e) => setRenameChatValue(e.target.value)}
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 rounded bg-gray-300 text-black"
-                onClick={() => setShowRenameChatModal(false)}
-              >
-                Cancelar
-              </button>
-              <button
-                className="px-4 py-2 rounded bg-blue-600 text-white"
-                onClick={async () => {
-                  await renameChat(contextMenu.data.id, renameChatValue)
-                }}
-              >
-                Guardar
-              </button>
+        <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80">
+          <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
+            <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
+              <h2 className="text-lg font-semibold mb-4">Cambiar nombre</h2>
+              <input
+                type="text"
+                className="bg-token-main-surface-primary w-full resize-none focus:ring-transparent rounded-lg border text-sm focus-token-border-heavy border-token-border-default placeholder:text-gray-400 placeholder:text-gray-300"
+                placeholder={renameChatValue}
+                onChange={(e) => setRenameChatValue(e.target.value)}
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  className="btn relative btn-secondary mt-4"
+                  onClick={() => setShowRenameChatModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn relative btn-primary mt-4"
+                  onClick={async () => {
+                    await renameChat(contextMenu.data.id, renameChatValue)
+                  }}
+                >
+                  Guardar
+                </button>
+              </div>
             </div>
           </div>
         </div>
