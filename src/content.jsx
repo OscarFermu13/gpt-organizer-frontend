@@ -5,6 +5,8 @@ import CreateButton from './CreateButton';
 import AuthPanel from './AuthPanel';
 import './style.css'
 
+const API_URL = 'http://localhost:4000/auth';
+
 function waitForElement(selector, timeout = 10000) {
   return new Promise((resolve, reject) => {
     const interval = 100;
@@ -47,19 +49,31 @@ function observeMenuOpen() {
 
 (async () => {
   try {
-    //const target = await waitForElement('#late-load-sidebar-items');
     const history = await waitForElement('#history');
 
     const container = document.createElement('div');
     container.id = 'gpt-organizer-folderlist-root';
 
-    // Evita inyecciones múltiples si recargas el script
     if (!document.querySelector('#gpt-organizer-folderlist-root')) {
-      //target.insertBefore(container, history);
       history.prepend(container);
       const root = createRoot(container);
-      root.render(<FolderList />);
-      root.render(<AuthPanel />);
+
+      const res = await fetch(`${API_URL}/validate`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      const isAuthenticated = res.ok;
+
+      if (isAuthenticated) {
+        root.render(<FolderList />);
+        //window.location.reload();
+      }
+      else 
+        root.render(<AuthPanel />);
+      
+       
+
       observeMenuOpen();
     }
   } catch (error) {

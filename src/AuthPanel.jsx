@@ -22,6 +22,7 @@ export default function AuthPanel() {
             const res = await fetch(`${API_URL}/${endpoint}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ email, password }),
             });
 
@@ -29,6 +30,7 @@ export default function AuthPanel() {
             const data = await res.json();
 
             console.log('Respuesta:', data);
+            window.location.reload();
             setShowModal(false);
         } catch (err) {
             console.error(err);

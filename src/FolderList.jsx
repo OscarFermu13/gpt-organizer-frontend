@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 export default function FolderList() {
   const API_URL_FOLDER = 'http://localhost:4000/folders';
   const API_URL_CHAT = 'http://localhost:4000/chats';
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWJjMDR3MnAwMDAwMXlrcDEyNzJsYWlrIiwiaWF0IjoxNzQ4NjgyMTkxLCJleHAiOjE3NDkyODY5OTF9.JHrZvsvQuZEv-gjWNdFrEHwnmZXqNf2KaggYm8FQmvo';
+  const API_URL_AUTH = 'http://localhost:4000/auth';
 
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,9 +49,11 @@ export default function FolderList() {
     async function fetchFolders() {
       try {
         const res = await fetch(API_URL_FOLDER, {
+          method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
+          credentials: 'include',
         });
 
         if (!res.ok) throw new Error(`Error ${res.status}`);
@@ -74,14 +76,29 @@ export default function FolderList() {
     return () => window.removeEventListener('folderUpdated', handleUpdate);
   }, []);
 
+  async function logout() {
+    try {
+      const res = await fetch(`${API_URL_AUTH}/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (!res.ok) throw new Error('Error al cerrar sesión');
+      window.location.reload();
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   async function createFolder() {
     try {
       const res = await fetch(API_URL_FOLDER, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({
           name: newFolderName,
           color: newFolderColor,
@@ -106,8 +123,8 @@ export default function FolderList() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ name: newName }),
       });
 
@@ -136,8 +153,8 @@ export default function FolderList() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ parentId: parentId }),
       });
 
@@ -155,9 +172,7 @@ export default function FolderList() {
     try {
       const res = await fetch(`${API_URL_FOLDER}/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
 
       if (!res.ok) throw new Error('Error al eliminar la carpeta');
@@ -175,8 +190,8 @@ export default function FolderList() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ title: newTitle }),
       });
 
@@ -196,8 +211,8 @@ export default function FolderList() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ folderId: folderId }),
       });
 
@@ -215,9 +230,7 @@ export default function FolderList() {
     try {
       const res = await fetch(`${API_URL_CHAT}/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
 
       if (!res.ok) throw new Error('Error al eliminar el chat');
@@ -335,17 +348,23 @@ export default function FolderList() {
         <li
           onClick={() => setShowCreateModal(true)}
           className='group __menu-item gap-2 data-fill:gap-2'
-        //className="hover:bg-gray-300 flex items-center space-x-2 cursor-pointer rounded p-2"
         >
           <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FFFFFF' }}></span>
           <span className="text-sm">Crear carpeta</span>
+        </li>
+
+        <li
+          className='group __menu-item gap-2 data-fill:gap-2'
+          onClick={() => logout()}
+        >
+          <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FFFFFF' }}></span>
+          <span className="btn btn-secondary">Logout</span>
         </li>
       </ul>
 
       {/* Modal */}
       {showCreateModal && (
         <div
-          //className='popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]'  
           className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80"
           onClick={() => setShowCreateModal(false)}>
           <div

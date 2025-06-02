@@ -7,7 +7,6 @@ const ListFoldersModal = ({ onClose }) => {
 
     const API_URL_FOLDER = 'http://localhost:4000/folders';
     const API_URL_CHAT = 'http://localhost:4000/chats';
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWJjMDR3MnAwMDAwMXlrcDEyNzJsYWlrIiwiaWF0IjoxNzQ4NjgyMTkxLCJleHAiOjE3NDkyODY5OTF9.JHrZvsvQuZEv-gjWNdFrEHwnmZXqNf2KaggYm8FQmvo';
 
     const chatHref = sessionStorage.getItem("lastChatHref");
     const chatId = chatHref?.split("/c/")[1] ?? null;
@@ -17,9 +16,7 @@ const ListFoldersModal = ({ onClose }) => {
         async function fetchFolders() {
             try {
                 const res = await fetch(API_URL_FOLDER, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    credentials: 'include',
                 });
 
                 if (!res.ok) throw new Error(`Error ${res.status}`);
@@ -42,8 +39,8 @@ const ListFoldersModal = ({ onClose }) => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         folderId: folderId,
                         favorite: true,
@@ -89,7 +86,7 @@ const ListFoldersModal = ({ onClose }) => {
                     onClick={(e) => e.stopPropagation()}
                 >
                     <h2 className="text-lg font-semibold mb-4">Carpetas</h2>
-                    
+
                     {loading ? (
                         <p className="text-sm text-gray-500">Cargando...</p>
                     ) : (
