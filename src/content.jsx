@@ -65,14 +65,10 @@ function observeMenuOpen() {
 
       const isAuthenticated = res.ok;
 
-      if (isAuthenticated) {
+      if (isAuthenticated)
         root.render(<FolderList />);
-        //window.location.reload();
-      }
       else 
         root.render(<AuthPanel />);
-      
-       
 
       observeMenuOpen();
     }

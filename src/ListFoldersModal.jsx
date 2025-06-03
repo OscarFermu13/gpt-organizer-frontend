@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { translations } from './translations.jsx';
 
 const ListFoldersModal = ({ onClose }) => {
     const [folders, setFolders] = useState([]);
@@ -7,6 +8,10 @@ const ListFoldersModal = ({ onClose }) => {
 
     const API_URL_FOLDER = 'http://localhost:4000/folders';
     const API_URL_CHAT = 'http://localhost:4000/chats';
+    const API_URL = 'http://localhost:4000';
+
+    const lang = "en";
+    const t = translations[lang];
 
     const chatHref = sessionStorage.getItem("lastChatHref");
     const chatId = chatHref?.split("/c/")[1] ?? null;
@@ -85,10 +90,10 @@ const ListFoldersModal = ({ onClose }) => {
                     className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <h2 className="text-lg font-semibold mb-4">Carpetas</h2>
+                    <h2 className="text-lg font-semibold mb-4">{t.add_to_folder_modal.title}</h2>
 
                     {loading ? (
-                        <p className="text-sm text-gray-500">Cargando...</p>
+                        <p className="text-sm text-gray-500">{t.add_to_folder_modal.loading}</p>
                     ) : (
                         <ul className="mt-2 flex flex-wrap gap-x-1 gap-y-2">
                             {folders.map(folder => (
@@ -106,7 +111,7 @@ const ListFoldersModal = ({ onClose }) => {
                         onClick={() => onClose()}
                         className="btn relative btn-secondary mt-4"
                     >
-                        Cerrar
+                        {t.add_to_folder_modal.btn_cancel}
                     </button>
                 </div>
             </div>
