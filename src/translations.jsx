@@ -8,6 +8,11 @@ export const translations = {
 
     gear_menu: {
       logout: "Logout",
+      language: {
+        title: "Change language",
+        btn_cancel: "Cancel",
+        btn_save: "Save",
+      },
     },
 
     auth: {
@@ -59,13 +64,16 @@ export const translations = {
     //WIP
     changeColor_folder_modal: {
       title: "Rename folder",
+      color: "Color: ",
       btn_cancel: "Cancel",
       btn_save: "Save",
     },
 
     //WIP
     addSubfolder_folder_modal: {
-      title: "Rename folder",
+      title: "Add subfolder",
+      name_placeholder: "Folder name",
+      color: "Color: ",
       btn_cancel: "Cancel",
       btn_save: "Save",
     },
@@ -87,7 +95,10 @@ export const translations = {
     },
 
   },
-  /*es: {
-    
-  }*/
+  es: {
+    sidebar_header: "Carpetas",
+    sidebar_extension_name: "GPT Organizer",
+    sidebar_create_folder_btn: "Create folder",
+    sidebar_loading_message: "Loading folders...",
+  }
 };
