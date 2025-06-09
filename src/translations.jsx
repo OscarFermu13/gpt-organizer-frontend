@@ -61,15 +61,13 @@ export const translations = {
       btn_save: "Save",
     },
 
-    //WIP
     changeColor_folder_modal: {
-      title: "Rename folder",
+      title: "Change folder color",
       color: "Color: ",
       btn_cancel: "Cancel",
       btn_save: "Save",
     },
 
-    //WIP
     addSubfolder_folder_modal: {
       title: "Add subfolder",
       name_placeholder: "Folder name",
@@ -98,7 +96,93 @@ export const translations = {
   es: {
     sidebar_header: "Carpetas",
     sidebar_extension_name: "GPT Organizer",
-    sidebar_create_folder_btn: "Create folder",
-    sidebar_loading_message: "Loading folders...",
+    sidebar_create_folder_btn: "Crear carpeta",
+    sidebar_loading_message: "Cargando carpetas...",
+
+    gear_menu: {
+      logout: "Cerrar sesión",
+      language: {
+        title: "Cambiar idioma",
+        btn_cancel: "Cancelar",
+        btn_save: "Guardar",
+      },
+    },
+
+    auth: {
+      login: "Iniciar sesión",
+      register: "Registrarse",
+      email_placeholder: "Correo electrónico",
+      password_placeholder: "Contraseña",
+      btn_login: "Iniciar sesión",
+      btn_register: "Crear cuenta",
+      btn_cancel: "Cancelar",
+    },
+
+    add_to_folder_modal: {
+      add_chat_btn: "Añadir a carpeta",
+      title: "Carpetas",
+      loading_message: "Cargando carpetas...",
+      btn_cancel: "Cancelar",
+    },
+
+    context_menu: {
+      folder: {
+        rename: "Cambiar el nombre",
+        change_color: "Cambiar color",
+        add_subfolder: "Añadir subcarpeta",
+        move: "Mover",
+        delete: "Eliminar",
+      },
+      chat: {
+        rename: "Cambiar el nombre",
+        move: "Mover",
+        delete: "Eliminar",
+      },
+    },
+
+    create_folder_modal: {
+      title: "Nueva carpeta",
+      name_placeholder: "Nombre de la carpeta",
+      color: "Color: ",
+      btn_cancel: "Cancelar",
+      btn_create: "Crear carpeta",
+    },
+
+    rename_folder_modal: {
+      title: "Renombrar carpeta",
+      btn_cancel: "Cancelar",
+      btn_save: "Guardar",
+    },
+
+    changeColor_folder_modal: {
+      title: "Cambiar color de carpeta",
+      color: "Color: ",
+      btn_cancel: "Cancelar",
+      btn_save: "Guardar",
+    },
+
+    addSubfolder_folder_modal: {
+      title: "Añadir subcarpeta",
+      name_placeholder: "Nombre de la carpeta",
+      color: "Color: ",
+      btn_cancel: "Cancelar",
+      btn_save: "Guardar",
+    },
+
+    move_folder_modal: {
+      title: "Mover carpeta",
+      btn_cancel: "Cancelar",
+    },
+
+    rename_chat_modal: {
+      title: "Renombrar chat",
+      btn_cancel: "Cancelar",
+      btn_save: "Guardar",
+    },
+
+    move_chat_modal: {
+      title: "Mover chat",
+      btn_cancel: "Cancelar",
+    },
   }
 };

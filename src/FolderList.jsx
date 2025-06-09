@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { translations } from './translations.jsx';
+import { setLanguage, getTranslator, getLanguage } from './i18n.jsx';
 
 export default function FolderList() {
   const API_URL_FOLDER = 'https://gpt-organizer-backend.onrender.com/folders';
@@ -24,11 +24,12 @@ export default function FolderList() {
   const [showChangeFolderColorModal, setShowChangeFolderColorModal] = useState(false);
   const [changeFolderColorValue, setChangeFolderColorValue] = useState('#888888');
 
-
   const [cogMenuModal, setCogMenuModal] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
 
   const [showChangeLanguageModal, setShowChangeLanguageModal] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(getLanguage());
+  let t = getTranslator();
 
   const openContextMenu = (e, type, data) => {
     e.stopPropagation();
@@ -53,31 +54,6 @@ export default function FolderList() {
   };
 
   const closeCogMenu = () => setCogMenuModal(null);
-
-  var t = translations['en'];
-
-  function setLanguageAsync(language) {
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.set({ language }, () => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-
-  async function changeLanguage(language) {
-    try {
-      await setLanguageAsync(language);
-      const t = translations[language];
-      console.log(t.sidebar_header);
-      window.location.reload();
-    } catch (err) {
-      console.error('Error guardando idioma:', err);
-    }
-  }
 
   const [expandedFolders, setExpandedFolders] = useState(() => {
     try {
@@ -532,22 +508,17 @@ export default function FolderList() {
           <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
             <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
               <h2 className="text-lg font-semibold mb-4">{t.gear_menu.language.title}</h2>
-              {/*<input
-                type="text"
-                className="bg-token-main-surface-primary w-full resize-none focus:ring-transparent rounded-lg border text-sm focus-token-border-heavy border-token-border-default placeholder:text-gray-400 placeholder:text-gray-300"
-                placeholder={renameFolderValue}
-                onChange={(e) => setRenameFolderValue(e.target.value)}
-              />*/}
 
-
-              <form class="max-w-sm mx-auto">
-                <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an option</label>
-                <select id="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  <option selected>Choose a country</option>
-                  <option value="US">United States</option>
-                  <option value="CA">Canada</option>
-                  <option value="FR">France</option>
-                  <option value="DE">Germany</option>
+              <form class="w-full mx-auto">
+                <label for="language" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{t.gear_menu.language.title}</label>
+                <select
+                  id="language"
+                  value={selectedLanguage}
+                  onChange={(e) => setSelectedLanguage(e.target.value)}
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                  <option value="en">English</option>
+                  <option value="es">Español</option>
                 </select>
               </form>
 
@@ -561,9 +532,10 @@ export default function FolderList() {
                 </button>
                 <button
                   className="btn relative btn-primary mt-4"
-                  onClick={async () => {
-                    await changeLanguage("es");
-                    setShowChangeLanguageModal(false);
+                  onClick={() => {
+                    setLanguage(selectedLanguage);
+                    t = getTranslator();
+                    window.location.reload();
                   }}
                 >
                   {t.gear_menu.language.btn_save}
@@ -808,7 +780,7 @@ export default function FolderList() {
                 {folders.map(folder => (
                   <li
                     key={folder.id}
-                    style={ { borderColor: folder.color }}
+                    style={{ borderColor: folder.color }}
                     className="btn relative btn-secondary btn-small text-token-text-secondary py-2 ps-2 pe-3 text-md font-normal"
                     onClick={() => addParentFolder(contextMenu.data.id, folder.id)}
                   >
@@ -953,7 +925,7 @@ export default function FolderList() {
                 {folders.map(folder => (
                   <li
                     key={folder.id}
-                    style={ { borderColor: folder.color }}
+                    style={{ borderColor: folder.color }}
                     className="btn relative btn-secondary btn-small text-token-text-secondary py-2 ps-2 pe-3 text-md font-normal"
                     onClick={() => moveChat(contextMenu.data.id, folder.id)}
                   >
