@@ -7,7 +7,7 @@ export default function AuthPanel() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const API_URL = 'http://localhost:4000/auth';
+    const API_URL = 'https://gpt-organizer-backend.onrender.com/auth';
 
     const lang = "en";
     const t = translations[lang];

@@ -2,13 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { translations } from './translations.jsx';
 
 export default function FolderList() {
-  const API_URL_FOLDER = 'http://localhost:4000/folders';
-  const API_URL_CHAT = 'http://localhost:4000/chats';
-  const API_URL_AUTH = 'http://localhost:4000/auth';
-  const API_URL = 'http://localhost:4000';
-
-  const lang = "en";
-  var t = translations[lang];
+  const API_URL_FOLDER = 'https://gpt-organizer-backend.onrender.com/folders';
+  const API_URL_CHAT = 'https://gpt-organizer-backend.onrender.com/chats';
+  const API_URL_AUTH = 'https://gpt-organizer-backend.onrender.com/auth';
+  const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,10 +20,10 @@ export default function FolderList() {
   const [showMoveChatModal, setShowMoveChatModal] = useState(false);
   const [showAddSubfolderModal, setShowAddSubfolderModal] = useState(false);
   const [addSubfolderName, setAddSubfolderName] = useState('');
-  const [addSubfolderColor, setAddSubfolderColor] = useState('');
+  const [addSubfolderColor, setAddSubfolderColor] = useState('#888888');
   const [showChangeFolderColorModal, setShowChangeFolderColorModal] = useState(false);
   const [changeFolderColorValue, setChangeFolderColorValue] = useState('#888888');
-  
+
 
   const [cogMenuModal, setCogMenuModal] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
@@ -57,10 +54,29 @@ export default function FolderList() {
 
   const closeCogMenu = () => setCogMenuModal(null);
 
+  var t = translations['en'];
+
+  function setLanguageAsync(language) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.set({ language }, () => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
   async function changeLanguage(language) {
-    t = translations[language];
-    console.log(t.sidebar_header)
-    //window.location.reload();
+    try {
+      await setLanguageAsync(language);
+      const t = translations[language];
+      console.log(t.sidebar_header);
+      window.location.reload();
+    } catch (err) {
+      console.error('Error guardando idioma:', err);
+    }
   }
 
   const [expandedFolders, setExpandedFolders] = useState(() => {
@@ -123,6 +139,7 @@ export default function FolderList() {
   }
 
   async function createFolder() {
+    if (!newFolderName.trim()) return;
     try {
       const res = await fetch(API_URL_FOLDER, {
         method: 'POST',
@@ -149,6 +166,7 @@ export default function FolderList() {
   }
 
   async function renameFolder(id, newName) {
+    if (!newName.trim()) return;
     try {
       const res = await fetch(`${API_URL_FOLDER}/${id}`, {
         method: 'PUT',
@@ -200,6 +218,7 @@ export default function FolderList() {
   }
 
   async function addSubfolder(parentId, name, color) {
+    if (!name.trim()) return;
     try {
       const res = await fetch(API_URL_FOLDER, {
         method: 'POST',
@@ -265,6 +284,7 @@ export default function FolderList() {
   }
 
   async function renameChat(id, newTitle) {
+    if (!newTitle.trim()) return;
     try {
       const res = await fetch(`${API_URL_CHAT}/${id}`, {
         method: 'PUT',
@@ -369,7 +389,15 @@ export default function FolderList() {
     const isExpanded = expandedFolders[folder.id];
 
     return (
-      <div key={folder.id}>
+      <div key={folder.id} className="relative">
+
+        {isExpanded && (folder.chats?.length > 0 || folder.children?.length > 0) && (
+          <div
+            className="absolute top-8 bottom-2 w-px bg-gray-600"
+            style={{ left: `calc(${(depth + 1) * 16}px + 0.3rem)` }}
+          />
+        )}
+
         <div
           className="group __menu-item gap-2 data-fill:gap-2 justify-between"
           style={{ paddingLeft: `${depth * 16}px` }}
@@ -399,7 +427,7 @@ export default function FolderList() {
               <div
                 key={chat.id}
                 className="group __menu-item gap-6 data-fill:gap-2 justify-between"
-                style={{ paddingLeft: `${(depth + 1) * 16}px` }}
+                style={{ paddingLeft: `${(depth + 2) * 16}px` }}
               >
                 <div className="truncate">
                   <a href={"https://chatgpt.com/c/" + chat.chatId}>{chat.title}</a>
@@ -430,7 +458,7 @@ export default function FolderList() {
         <h6 className="__menu-label">{t.sidebar_header}</h6>
         <button
           onClick={(e) => openCogMenu(e)}
-          className=""
+          className="text-gray-400"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
@@ -472,9 +500,9 @@ export default function FolderList() {
                 setShowChangeLanguageModal(true);
               }}
             >
-              <div className="flex items-center justify-center h-4 w-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+              <div className="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
                 </svg>
               </div>
               <span>{t.gear_menu.language.title}</span>
@@ -487,9 +515,9 @@ export default function FolderList() {
               data-color="danger"
               onClick={() => logout()}
             >
-              <div className="flex items-center justify-center h-4 w-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+              <div className="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
                 </svg>
               </div>
               <span>{t.gear_menu.logout}</span>
@@ -504,12 +532,26 @@ export default function FolderList() {
           <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
             <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
               <h2 className="text-lg font-semibold mb-4">{t.gear_menu.language.title}</h2>
-              <input
+              {/*<input
                 type="text"
                 className="bg-token-main-surface-primary w-full resize-none focus:ring-transparent rounded-lg border text-sm focus-token-border-heavy border-token-border-default placeholder:text-gray-400 placeholder:text-gray-300"
                 placeholder={renameFolderValue}
                 onChange={(e) => setRenameFolderValue(e.target.value)}
-              />
+              />*/}
+
+
+              <form class="max-w-sm mx-auto">
+                <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an option</label>
+                <select id="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                  <option selected>Choose a country</option>
+                  <option value="US">United States</option>
+                  <option value="CA">Canada</option>
+                  <option value="FR">France</option>
+                  <option value="DE">Germany</option>
+                </select>
+              </form>
+
+
               <div className="flex justify-end gap-2">
                 <button
                   className="btn relative btn-secondary mt-4"
@@ -553,9 +595,9 @@ export default function FolderList() {
                   setShowRenameFolderModal(true);
                 }}
               >
-                <div className="flex items-center justify-center h-4 w-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                <div className="flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                   </svg>
                 </div>
                 <span>{t.context_menu.folder.rename}</span>
@@ -565,9 +607,9 @@ export default function FolderList() {
                 className="group __menu-item pe-8 gap-1.5"
                 onClick={() => setShowMoveFolderModal(true)}
               >
-                <div className="flex items-center justify-center h-4 w-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                <div className="flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
                   </svg>
                 </div>
                 <span>{t.context_menu.folder.move}</span>
@@ -579,8 +621,8 @@ export default function FolderList() {
                   setShowAddSubfolderModal(true);
                 }}
               >
-                <div className="flex items-center justify-center h-4 w-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
+                <div className="flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
                   </svg>
                 </div>
@@ -590,12 +632,13 @@ export default function FolderList() {
               <div
                 className="group __menu-item pe-8 gap-1.5"
                 onClick={() => {
+                  setChangeFolderColorValue(contextMenu.data.color || '#888888');
                   setShowChangeFolderColorModal(true);
                 }}
               >
-                <div className="flex items-center justify-center h-4 w-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                <div className="flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
                   </svg>
                 </div>
                 <span>{t.context_menu.folder.change_color}</span>
@@ -608,9 +651,9 @@ export default function FolderList() {
                 data-color="danger"
                 onClick={() => deleteFolder(contextMenu.data.id)}
               >
-                <div className="flex items-center justify-center h-4 w-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                <div className="flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                   </svg>
                 </div>
                 <span>{t.context_menu.folder.delete}</span>
@@ -632,8 +675,8 @@ export default function FolderList() {
                 }}
               >
                 <div className="flex items-center justify-center h-4 w-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                   </svg>
                 </div>
                 <span>{t.context_menu.chat.rename}</span>
@@ -644,8 +687,8 @@ export default function FolderList() {
                 onClick={() => setShowMoveChatModal(true)}
               >
                 <div className="flex items-center justify-center h-4 w-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
                   </svg>
                 </div>
                 <span>{t.context_menu.chat.move}</span>
@@ -659,8 +702,8 @@ export default function FolderList() {
                 onClick={() => deleteChat(contextMenu.data.id)}
               >
                 <div className="flex items-center justify-center h-4 w-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                   </svg>
                 </div>
                 <span>{t.context_menu.chat.delete}</span>
@@ -711,6 +754,7 @@ export default function FolderList() {
                 </button>
                 <button
                   onClick={createFolder}
+                  disabled={!newFolderName.trim()}
                   className="btn relative btn-primary ms-4 me-0 mt-0 rounded-full px-4 py-1 text-base font-bold sm:py-3"
                 >
                   {t.create_folder_modal.btn_create}
@@ -741,6 +785,7 @@ export default function FolderList() {
                 </button>
                 <button
                   className="btn relative btn-primary mt-4"
+                  disabled={!renameFolderValue.trim() || renameFolderValue === contextMenu.data.name}
                   onClick={async () => {
                     await renameFolder(contextMenu.data.id, renameFolderValue)
                   }}
@@ -763,6 +808,7 @@ export default function FolderList() {
                 {folders.map(folder => (
                   <li
                     key={folder.id}
+                    style={ { borderColor: folder.color }}
                     className="btn relative btn-secondary btn-small text-token-text-secondary py-2 ps-2 pe-3 text-md font-normal"
                     onClick={() => addParentFolder(contextMenu.data.id, folder.id)}
                   >
@@ -815,6 +861,7 @@ export default function FolderList() {
                 </button>
                 <button
                   className="btn relative btn-primary mt-4"
+                  disabled={!addSubfolderName.trim()}
                   onClick={async () => {
                     await addSubfolder(contextMenu.data.id, addSubfolderName, addSubfolderColor)
                   }}
@@ -883,6 +930,7 @@ export default function FolderList() {
                 </button>
                 <button
                   className="btn relative btn-primary mt-4"
+                  disabled={!renameChatValue.trim() || renameChatValue === contextMenu.data.title}
                   onClick={async () => {
                     await renameChat(contextMenu.data.id, renameChatValue)
                   }}
@@ -905,6 +953,7 @@ export default function FolderList() {
                 {folders.map(folder => (
                   <li
                     key={folder.id}
+                    style={ { borderColor: folder.color }}
                     className="btn relative btn-secondary btn-small text-token-text-secondary py-2 ps-2 pe-3 text-md font-normal"
                     onClick={() => moveChat(contextMenu.data.id, folder.id)}
                   >

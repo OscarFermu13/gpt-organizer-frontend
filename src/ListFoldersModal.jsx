@@ -6,9 +6,9 @@ const ListFoldersModal = ({ onClose }) => {
     const [folders, setFolders] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const API_URL_FOLDER = 'http://localhost:4000/folders';
-    const API_URL_CHAT = 'http://localhost:4000/chats';
-    const API_URL = 'http://localhost:4000';
+    const API_URL_FOLDER = 'https://gpt-organizer-backend.onrender.com/folders';
+    const API_URL_CHAT = 'https://gpt-organizer-backend.onrender.com/chats';
+    const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
     const lang = "en";
     const t = translations[lang];
@@ -99,6 +99,7 @@ const ListFoldersModal = ({ onClose }) => {
                             {folders.map(folder => (
                                 <li
                                     key={folder.id}
+                                    style={ { borderColor: folder.color }}
                                     className="btn relative btn-secondary btn-small text-token-text-secondary py-2 ps-2 pe-3 text-md font-normal"
                                     onClick={() => handleFolderClick(folder.id)}
                                 >

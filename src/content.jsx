@@ -5,7 +5,7 @@ import CreateButton from './CreateButton';
 import AuthPanel from './AuthPanel';
 import './style.css'
 
-const API_URL = 'http://localhost:4000/auth';
+const API_URL = 'https://gpt-organizer-backend.onrender.com/auth';
 
 function waitForElement(selector, timeout = 10000) {
   return new Promise((resolve, reject) => {

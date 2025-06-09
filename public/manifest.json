@@ -3,17 +3,31 @@
   "name": "GPT Organizer",
   "version": "0.0.1",
   "description": "Organiza tus chats de ChatGPT en carpetas",
-  "host_permissions": ["https://chatgpt.com/*"],
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://gpt-organizer-backend.onrender.com/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://chatgpt.com/*"],
-      "js": ["assets/content.js"]
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "assets/content.js"
+      ]
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["assets/*"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "assets/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ]
 }
