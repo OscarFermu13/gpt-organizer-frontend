@@ -131,9 +131,11 @@ export default function FolderList() {
       const newFolder = await res.json();
 
       setFolders([...folders, newFolder]);
+      toggleFolder(newFolder.id)
       setShowCreateModal(false);
       setNewFolderName('');
       setNewFolderColor('#888888');
+      window.dispatchEvent(new CustomEvent('folderUpdated'));
     } catch (err) {
       console.error(err);
     }
@@ -405,8 +407,15 @@ export default function FolderList() {
             <svg width="16" height="16" viewBox="0 0 24 24" style={{ fill: folder.color || '#FFFFFF' }}>
               <path d="M19.906 9c.382 0 .749.057 1.094.162V9a3 3 0 0 0-3-3h-3.879a.75.75 0 0 1-.53-.22L11.47 3.66A2.25 2.25 0 0 0 9.879 3H6a3 3 0 0 0-3 3v3.162A3.756 3.756 0 0 1 4.094 9h15.812ZM4.094 10.5a2.25 2.25 0 0 0-2.227 2.568l.857 6A2.25 2.25 0 0 0 4.951 21H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-2.227-2.568H4.094Z" />
             </svg>
-            <div className="truncate">
+            <div className="truncate flex items-center gap-1">
               <span className="text-sm truncate">{folder.name}</span>
+              {!isExpanded && (folder.chats?.length > 0 || folder.children?.length > 0) && (
+                //<span className="text-xs text-gray-500">+</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-4">
+                  <path fillRule="evenodd" d="M12.53 16.28a.75.75 0 0 1-1.06 0l-7.5-7.5a.75.75 0 0 1 1.06-1.06L12 14.69l6.97-6.97a.75.75 0 1 1 1.06 1.06l-7.5 7.5Z" clipRule="evenodd" />
+                </svg>
+
+              )}
             </div>
           </div>
           <button
