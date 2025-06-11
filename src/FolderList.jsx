@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { setLanguage, getTranslator, getLanguage } from './i18n.jsx';
+import DefaultColorPalette from './DefaultColorPalette.jsx';
 
 export default function FolderList() {
   const API_URL = 'https://gpt-organizer-backend.onrender.com';
@@ -732,15 +733,11 @@ export default function FolderList() {
                 className="bg-token-main-surface-primary w-full resize-none focus:ring-transparent rounded-lg border text-sm focus-token-border-heavy border-token-border-default placeholder:text-gray-400 placeholder:text-gray-300"
               />
 
-              <div className="pt-4 flex items-center space-x-3">
-                <label className="text-muted text-token-text-primary py-2 text-sm font-medium">{t.create_folder_modal.color}</label>
-                <input
-                  type="color"
-                  value={newFolderColor}
-                  onChange={(e) => setNewFolderColor(e.target.value)}
-                  className="w-8 h-8 border-token-border-medium flex items-center justify-between gap-2 rounded-sm border whitespace-nowrap"
-                />
-              </div>
+              <DefaultColorPalette
+                value={newFolderColor}
+                onChange={(color) => setNewFolderColor(color)}
+              />
+
               <div className="flex justify-end space-x-2">
                 <button
                   onClick={() => setShowCreateModal(false)}
@@ -856,15 +853,11 @@ export default function FolderList() {
                 placeholder={t.addSubfolder_folder_modal.name_placeholder}
                 onChange={(e) => setAddSubfolderName(e.target.value)}
               />
-              <div className="pt-4 flex items-center space-x-3">
-                <label className="text-muted text-token-text-primary py-2 text-sm font-medium">{t.addSubfolder_folder_modal.color}</label>
-                <input
-                  type="color"
-                  value={addSubfolderColor}
-                  onChange={(e) => setAddSubfolderColor(e.target.value)}
-                  className="w-8 h-8 border-token-border-medium flex items-center justify-between gap-2 rounded-sm border whitespace-nowrap"
-                />
-              </div>
+
+              <DefaultColorPalette
+                value={addSubfolderColor}
+                onChange={(color) => setAddSubfolderColor(color)}
+              />
 
               <div className="flex justify-end gap-2">
                 <button
@@ -899,15 +892,11 @@ export default function FolderList() {
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-lg font-semibold mb-4">{t.changeColor_folder_modal.title}</h2>
-              <div className="pt-4 flex items-center space-x-3">
-                <label className="text-muted text-token-text-primary py-2 text-sm font-medium">{t.changeColor_folder_modal.color}</label>
-                <input
-                  type="color"
-                  value={changeFolderColorValue}
-                  onChange={(e) => setChangeFolderColorValue(e.target.value)}
-                  className="w-8 h-8 border-token-border-medium flex items-center justify-between gap-2 rounded-sm border whitespace-nowrap"
-                />
-              </div>
+
+              <DefaultColorPalette
+                value={changeFolderColorValue}
+                onChange={(color) => setChangeFolderColorValue(color)}
+              />
 
               <div className="flex justify-end gap-2">
                 <button

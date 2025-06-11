@@ -64,6 +64,7 @@ export const translations = {
     changeColor_folder_modal: {
       title: "Change folder color",
       color: "Color: ",
+      customColor: "Add custom color",
       btn_cancel: "Cancel",
       btn_save: "Save",
     },
@@ -157,6 +158,7 @@ export const translations = {
     changeColor_folder_modal: {
       title: "Cambiar color de carpeta",
       color: "Color: ",
+      customColor: "Color personalizado",
       btn_cancel: "Cancelar",
       btn_save: "Guardar",
     },
