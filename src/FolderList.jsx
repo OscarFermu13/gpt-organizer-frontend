@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { setLanguage, getTranslator, getLanguage } from './i18n.jsx';
 
 export default function FolderList() {
-  const API_URL_FOLDER = 'https://gpt-organizer-backend.onrender.com/folders';
-  const API_URL_CHAT = 'https://gpt-organizer-backend.onrender.com/chats';
-  const API_URL_AUTH = 'https://gpt-organizer-backend.onrender.com/auth';
   const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
   const [folders, setFolders] = useState([]);
@@ -71,7 +68,7 @@ export default function FolderList() {
   useEffect(() => {
     async function fetchFolders() {
       try {
-        const res = await fetch(API_URL_FOLDER, {
+        const res = await fetch(`${API_URL}/folders`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -101,7 +98,7 @@ export default function FolderList() {
 
   async function logout() {
     try {
-      const res = await fetch(`${API_URL_AUTH}/logout`, {
+      const res = await fetch(`${`${API_URL}/auth`}/logout`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -117,7 +114,7 @@ export default function FolderList() {
   async function createFolder() {
     if (!newFolderName.trim()) return;
     try {
-      const res = await fetch(API_URL_FOLDER, {
+      const res = await fetch(`${API_URL}/folders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -144,7 +141,7 @@ export default function FolderList() {
   async function renameFolder(id, newName) {
     if (!newName.trim()) return;
     try {
-      const res = await fetch(`${API_URL_FOLDER}/${id}`, {
+      const res = await fetch(`${`${API_URL}/folders`}/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -174,7 +171,7 @@ export default function FolderList() {
         return;
       }
 
-      const res = await fetch(`${API_URL_FOLDER}/${id}`, {
+      const res = await fetch(`${`${API_URL}/folders`}/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -196,7 +193,7 @@ export default function FolderList() {
   async function addSubfolder(parentId, name, color) {
     if (!name.trim()) return;
     try {
-      const res = await fetch(API_URL_FOLDER, {
+      const res = await fetch(`${API_URL}/folders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -224,7 +221,7 @@ export default function FolderList() {
   async function changeFolderColor(id, color) {
     try {
 
-      const res = await fetch(`${API_URL_FOLDER}/${id}`, {
+      const res = await fetch(`${`${API_URL}/folders`}/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -245,14 +242,14 @@ export default function FolderList() {
 
   async function deleteFolder(id) {
     try {
-      const res = await fetch(`${API_URL_FOLDER}/${id}`, {
+      const res = await fetch(`${`${API_URL}/folders`}/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
 
       if (!res.ok) throw new Error('Error al eliminar la carpeta');
 
-      setFolders(folders.filter(f => f.id !== id));
+      window.dispatchEvent(new CustomEvent('folderUpdated'));
       closeContextMenu();
     } catch (err) {
       console.error(err);
@@ -262,7 +259,7 @@ export default function FolderList() {
   async function renameChat(id, newTitle) {
     if (!newTitle.trim()) return;
     try {
-      const res = await fetch(`${API_URL_CHAT}/${id}`, {
+      const res = await fetch(`${`${API_URL}/chats`}/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -283,7 +280,7 @@ export default function FolderList() {
 
   async function moveChat(id, folderId) {
     try {
-      const res = await fetch(`${API_URL_CHAT}/${id}`, {
+      const res = await fetch(`${`${API_URL}/chats`}/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -304,7 +301,7 @@ export default function FolderList() {
 
   async function deleteChat(id) {
     try {
-      const res = await fetch(`${API_URL_CHAT}/${id}`, {
+      const res = await fetch(`${`${API_URL}/chats`}/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -360,6 +357,30 @@ export default function FolderList() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  function useEnterKey(active, action, condition = true) {
+    useEffect(() => {
+      if (!active) return;
+
+      const handleKeyDown = (e) => {
+        if (e.key === "Enter" && condition) {
+          e.preventDefault();
+          action();
+        }
+      };
+
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }, [active, action, condition]);
+  }
+
+  useEnterKey(showCreateModal, createFolder, newFolderName.trim() !== "");
+  useEnterKey(showRenameFolderModal, () => renameFolder(contextMenu.data.id, renameFolderValue), renameFolderValue.trim() !== "");
+  useEnterKey(showAddSubfolderModal, () => addSubfolder(contextMenu.data.id, addSubfolderName, addSubfolderColor), addSubfolderName.trim() !== "");
+  useEnterKey(showChangeFolderColorModal, () => changeFolderColor(contextMenu.data.id, changeFolderColorValue), true);
+  useEnterKey(showRenameChatModal, () => renameChat(contextMenu.data.id, renameChatValue), renameChatValue.trim() !== "");
 
   const renderFolder = (folder, depth = 0) => {
     const isExpanded = expandedFolders[folder.id];
@@ -429,7 +450,7 @@ export default function FolderList() {
   const folderTree = buildFolderTree(folders);
 
   return (
-    <div className="mt-4">
+    <div className="mt-(--sidebar-section-margin-top)">
       <div className="justify-between flex items-center gap-2 truncate">
         <h6 className="__menu-label">{t.sidebar_header}</h6>
         <button
@@ -504,9 +525,15 @@ export default function FolderList() {
       )}
 
       {showChangeLanguageModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80">
+        <div
+          className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80"
+          onClick={() => setShowChangeLanguageModal(false)}
+        >
           <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
-            <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
+            <div
+              className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2 className="text-lg font-semibold mb-4">{t.gear_menu.language.title}</h2>
 
               <form class="w-full mx-auto">
@@ -690,10 +717,7 @@ export default function FolderList() {
         <div
           className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80"
           onClick={() => setShowCreateModal(false)}>
-          <div
-            className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
             <div
               className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
               onClick={(e) => e.stopPropagation()}
@@ -738,9 +762,15 @@ export default function FolderList() {
       )}
 
       {showRenameFolderModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80">
+        <div
+          className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80"
+          onClick={() => setShowRenameFolderModal(false)}
+        >
           <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
-            <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
+            <div
+              className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2 className="text-lg font-semibold mb-4">{t.rename_folder_modal.title}</h2>
               <input
                 type="text"
@@ -771,9 +801,15 @@ export default function FolderList() {
       )}
 
       {showMoveFolderModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80">
+        <div
+          className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80"
+          onClick={() => setShowMoveFolderModal(false)}
+        >
           <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
-            <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
+            <div
+              className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2 className="text-lg font-semibold mb-4">{t.move_folder_modal.title}</h2>
 
               <ul className="mt-2 flex flex-wrap gap-x-1 gap-y-2">
@@ -803,9 +839,15 @@ export default function FolderList() {
       )}
 
       {showAddSubfolderModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80">
+        <div
+          className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80"
+          onClick={() => setShowAddSubfolderModal(false)}
+        >
           <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
-            <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
+            <div
+              className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2 className="text-lg font-semibold mb-4">{t.addSubfolder_folder_modal.title}</h2>
 
               <input
@@ -847,9 +889,15 @@ export default function FolderList() {
       )}
 
       {showChangeFolderColorModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80">
+        <div
+          className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80"
+          onClick={() => setShowChangeFolderColorModal(false)}
+        >
           <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
-            <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
+            <div
+              className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2 className="text-lg font-semibold mb-4">{t.changeColor_folder_modal.title}</h2>
               <div className="pt-4 flex items-center space-x-3">
                 <label className="text-muted text-token-text-primary py-2 text-sm font-medium">{t.changeColor_folder_modal.color}</label>
@@ -883,9 +931,15 @@ export default function FolderList() {
       )}
 
       {showRenameChatModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80">
+        <div
+          className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80"
+          onClick={() => setShowRenameChatModal(false)}
+        >
           <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
-            <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
+            <div
+              className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2 className="text-lg font-semibold mb-4">{t.rename_chat_modal.title}</h2>
               <input
                 type="text"
@@ -916,9 +970,15 @@ export default function FolderList() {
       )}
 
       {showMoveChatModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80">
+        <div
+          className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80"
+          onClick={() => setShowMoveChatModal(false)}
+        >
           <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
-            <div className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]">
+            <div
+              className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2 className="text-lg font-semibold mb-4">{t.move_chat_modal.title}</h2>
 
               <ul className="mt-2 flex flex-wrap gap-x-1 gap-y-2">

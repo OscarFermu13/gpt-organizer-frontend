@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { translations } from './translations.jsx';
+import { getTranslator } from './i18n.jsx';
 
 const ListFoldersModal = ({ onClose }) => {
     const [folders, setFolders] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const API_URL_FOLDER = 'https://gpt-organizer-backend.onrender.com/folders';
-    const API_URL_CHAT = 'https://gpt-organizer-backend.onrender.com/chats';
     const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
-    const lang = "en";
-    const t = translations[lang];
+    let t = getTranslator();
 
     const chatHref = sessionStorage.getItem("lastChatHref");
     const chatId = chatHref?.split("/c/")[1] ?? null;
@@ -20,7 +17,7 @@ const ListFoldersModal = ({ onClose }) => {
     useEffect(() => {
         async function fetchFolders() {
             try {
-                const res = await fetch(API_URL_FOLDER, {
+                const res = await fetch(`${API_URL}/folders`, {
                     credentials: 'include',
                 });
 
@@ -40,7 +37,7 @@ const ListFoldersModal = ({ onClose }) => {
     const handleFolderClick = async (folderId) => {
         try {
             if (chatId) {
-                const res = await fetch(API_URL_CHAT, {
+                const res = await fetch(`${API_URL}/chats`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -99,7 +96,7 @@ const ListFoldersModal = ({ onClose }) => {
                             {folders.map(folder => (
                                 <li
                                     key={folder.id}
-                                    style={ { borderColor: folder.color }}
+                                    style={{ borderColor: folder.color }}
                                     className="btn relative btn-secondary btn-small text-token-text-secondary py-2 ps-2 pe-3 text-md font-normal"
                                     onClick={() => handleFolderClick(folder.id)}
                                 >
@@ -108,12 +105,14 @@ const ListFoldersModal = ({ onClose }) => {
                             ))}
                         </ul>
                     )}
-                    <button
-                        onClick={() => onClose()}
-                        className="btn relative btn-secondary mt-4"
-                    >
-                        {t.add_to_folder_modal.btn_cancel}
-                    </button>
+                    <div className="flex justify-end gap-2">
+                        <button
+                            onClick={() => onClose()}
+                            className="btn relative btn-secondary mt-4"
+                        >
+                            {t.add_to_folder_modal.btn_cancel}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

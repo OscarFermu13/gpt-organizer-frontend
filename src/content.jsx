@@ -3,6 +3,7 @@ import React from 'react'
 import FolderList from './FolderList'
 import CreateButton from './CreateButton';
 import AuthPanel from './AuthPanel';
+import ChatToggle from './ChatToggle';
 import './style.css'
 
 const API_URL = 'https://gpt-organizer-backend.onrender.com/auth';
@@ -31,7 +32,7 @@ function observeMenuOpen() {
   const menuItemClass = 'touch:min-h-10 group relative mx-1.5 my-0 flex can-hover:cursor-pointer items-center rounded-[10px] py-2 px-2.5 text-sm select-none';
 
   const targetPathD =
-    "M13.2929 4.29291C15.0641 2.52167 17.9359 2.52167 19.7071 4.2929C21.4784 6.06414 21.4784 8.93588 19.7071 10.7071L18.7073 11.7069L11.6135 18.8007C10.8766 19.5376 9.92793 20.0258 8.89999 20.1971L4.16441 20.9864C3.84585 21.0395 3.52127 20.9355 3.29291 20.7071C3.06454 20.4788 2.96053 20.1542 3.01362 19.8356L3.80288 15.1C3.9742 14.0721 4.46243 13.1234 5.19932 12.3865L13.2929 4.29291ZM13 7.41422L6.61353 13.8007C6.1714 14.2428 5.87846 14.8121 5.77567 15.4288L5.21656 18.7835L8.57119 18.2244C9.18795 18.1216 9.75719 17.8286 10.1993 17.3865L16.5858 11L13 7.41422ZM18 9.5858L14.4142 6.00001L14.7071 5.70712C15.6973 4.71693 17.3027 4.71693 18.2929 5.70712C19.2831 6.69731 19.2831 8.30272 18.2929 9.29291L18 9.5858Z";
+    "M11.3312 3.56837C12.7488 2.28756 14.9376 2.33009 16.3038 3.6963L16.4318 3.83106C17.6712 5.20294 17.6712 7.29708 16.4318 8.66895L16.3038 8.80372L10.0118 15.0947C9.68833 15.4182 9.45378 15.6553 9.22179 15.8457L8.98742 16.0225C8.78227 16.1626 8.56423 16.2832 8.33703 16.3828L8.10753 16.4756C7.92576 16.5422 7.73836 16.5902 7.5216 16.6348L6.75695 16.7705L4.36339 17.169C4.22053 17.1928 4.06908 17.2188 3.94054 17.2285C3.84177 17.236 3.70827 17.2386 3.56261 17.2031L3.41417 17.1543C3.19115 17.0586 3.00741 16.8908 2.89171 16.6797L2.84581 16.5859C2.75951 16.3846 2.76168 16.1912 2.7716 16.0596C2.7813 15.931 2.80736 15.7796 2.83117 15.6367L3.2296 13.2432L3.36437 12.4785C3.40893 12.2616 3.45789 12.0745 3.52453 11.8926L3.6173 11.6621C3.71685 11.4352 3.83766 11.2176 3.97765 11.0127L4.15343 10.7783C4.34386 10.5462 4.58164 10.312 4.90538 9.98829L11.1964 3.6963L11.3312 3.56837ZM5.84581 10.9287C5.49664 11.2779 5.31252 11.4634 5.18663 11.6162L5.07531 11.7627C4.98188 11.8995 4.90151 12.0448 4.83507 12.1963L4.77355 12.3506C4.73321 12.4607 4.70242 12.5761 4.66808 12.7451L4.54113 13.4619L4.14269 15.8555L4.14171 15.8574H4.14464L6.5382 15.458L7.25499 15.332C7.424 15.2977 7.5394 15.2669 7.64953 15.2266L7.80285 15.165C7.95455 15.0986 8.09947 15.0174 8.23644 14.9238L8.3839 14.8135C8.53668 14.6876 8.72225 14.5035 9.0714 14.1543L14.0587 9.16602L10.8331 5.94044L5.84581 10.9287ZM15.3634 4.63673C14.5281 3.80141 13.2057 3.74938 12.3097 4.48048L12.1368 4.63673L11.7735 5.00001L15.0001 8.22559L15.3634 7.86329L15.5196 7.68946C16.2015 6.85326 16.2015 5.64676 15.5196 4.81056L15.3634 4.63673Z"
 
   const observer = new MutationObserver(() => {
     const menus = document.querySelectorAll(menuSelector);
@@ -54,6 +55,27 @@ function observeMenuOpen() {
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
+}
+
+function insertSidebarToggleComponent() {
+  const history = document.getElementById('history');
+  const folderList = document.getElementById('gpt-organizer-folderlist-root');
+  const aside = history?.querySelector('aside');
+  const heading = aside.querySelector('h2');
+
+  if (heading) heading.remove();
+  if (!history || !folderList || !aside || document.getElementById('sidebar-toggle-wrapper')) return;
+
+  aside.classList.remove('mt-(--sidebar-section-margin-top)');
+
+  // Crear contenedor
+  const container = document.createElement('div');
+  container.id = 'sidebar-toggle-wrapper';
+  folderList.insertAdjacentElement('afterend', container);
+
+  // Montar componente React
+  const root = createRoot(container);
+  root.render(<ChatToggle />);
 }
 
 (async () => {
@@ -80,6 +102,7 @@ function observeMenuOpen() {
         root.render(<AuthPanel />);
 
       observeMenuOpen();
+      insertSidebarToggleComponent();
     }
   } catch (error) {
     console.error('GPT Organizer: Failed to inject FolderList', error);

@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import ListFoldersModal from './ListFoldersModal';
-import { translations } from './translations.jsx';
+import { getTranslator } from './i18n.jsx';
 
 const CreateButton = () => {
   const [showModal, setShowModal] = useState(false);
 
-  const lang = "en";
-  const t = translations[lang];
+  let t = getTranslator();
 
   const handleClick = () => {
     const menu = document.querySelector('[role="menu"][data-radix-menu-content]');
