@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getTranslator } from './i18n.jsx';
+import { getTranslator } from '../lib/i18n.jsx';
 
 export default function AuthPanel() {
     const [showModal, setShowModal] = useState(false);
@@ -9,7 +9,7 @@ export default function AuthPanel() {
 
     const API_URL = 'https://gpt-organizer-backend.onrender.com/auth';
 
-    let t = getTranslator();
+    const t = getTranslator();
 
     const openModal = (mode) => {
         setAuthMode(mode);

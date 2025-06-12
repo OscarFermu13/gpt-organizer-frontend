@@ -93,6 +93,15 @@ export const translations = {
       btn_cancel: "Cancel",
     },
 
+    delete_modal: {
+      title: "Delete ",
+      message: "This will delete  ",
+      folder: "folder",
+      chat: "chat",
+      btn_cancel: "Cancel",
+      btn_delete: "Delete",
+    },
+
   },
   es: {
     sidebar_header: "Carpetas",
@@ -185,6 +194,15 @@ export const translations = {
     move_chat_modal: {
       title: "Mover chat",
       btn_cancel: "Cancelar",
+    },
+
+    delete_modal: {
+      title: "¿Eliminar ",
+      message: "Esto eliminará ",
+      folder: "carpeta",
+      chat: "chat",
+      btn_cancel: "Cancelar",
+      btn_delete: "Eliminar",
     },
   }
 };

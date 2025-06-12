@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { getTranslator } from './i18n.jsx';
+import { getTranslator } from '../lib/i18n.jsx';
 
 const ListFoldersModal = ({ onClose }) => {
     const [folders, setFolders] = useState([]);
@@ -8,7 +8,7 @@ const ListFoldersModal = ({ onClose }) => {
 
     const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
-    let t = getTranslator();
+    const t = getTranslator();
 
     const chatHref = sessionStorage.getItem("lastChatHref");
     const chatId = chatHref?.split("/c/")[1] ?? null;

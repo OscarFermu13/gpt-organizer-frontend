@@ -1,10 +1,9 @@
 import { createRoot } from 'react-dom/client'
 import React from 'react';
-import FolderList from './FolderList'
-import CreateButton from './CreateButton';
-import AuthPanel from './AuthPanel';
-import ChatToggle from './ChatToggle';
-import './style.css'
+import FolderList from './components/folderList/folderList';
+import CreateButton from './components/createButton';
+import AuthPanel from './components/authPanel';
+import ChatToggle from './components/chatToggle';
 
 const API_URL = 'https://gpt-organizer-backend.onrender.com/auth';
 

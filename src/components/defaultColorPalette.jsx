@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { RgbStringColorPicker } from "react-colorful";
-import { getTranslator } from './i18n.jsx';
+import { getTranslator } from '../lib/i18n.jsx';
 
 const COLORS = [
     // 💜 Morado Pastel
