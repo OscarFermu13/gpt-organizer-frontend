@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client'
-import React from 'react'
+import React from 'react';
 import FolderList from './FolderList'
 import CreateButton from './CreateButton';
 import AuthPanel from './AuthPanel';
