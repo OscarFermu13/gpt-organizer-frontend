@@ -17,6 +17,10 @@ import ChangeLanguageModal from './modals/changeLanguageModal';
 
 import { getTranslator } from '../../lib/i18n.jsx';
 
+const API_URL = 'https://gpt-organizer-backend.onrender.com';
+const WEB_URL = 'http://localhost:3000/dashboard';
+
+
 export default function FolderList() {
   const {
     folders,
@@ -99,11 +103,15 @@ export default function FolderList() {
         <CogMenu
           onClose={closeCogMenu}
           logout={() => {
-            fetch('https://gpt-organizer-backend.onrender.com/auth/logout', {
+            fetch(`${API_URL}/auth/logout`, {
               method: 'POST', credentials: 'include'
             }).then(() => window.location.reload());
           }}
           setShowLanguageModal={() => setModalState(s => ({ ...s, changeLang: true }))}
+          adminAccount={() => {
+            window.open(WEB_URL, '_blank');
+            closeCogMenu();
+          }}
           position={cogMenuPos}
         />
       )}

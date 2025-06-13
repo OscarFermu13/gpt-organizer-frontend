@@ -1,9 +1,9 @@
 import React from 'react';
 import { getTranslator } from '../../../lib/i18n.jsx';
 
-export default function CogMenu({ onClose, setShowLanguageModal, logout, position }) {
+export default function CogMenu({ onClose, setShowLanguageModal, logout, adminAccount, position }) {
     const t = getTranslator();
-    
+
     return (
         <div className="fixed inset-0 z-40" onClick={onClose} role="dialog">
             <div
@@ -19,8 +19,19 @@ export default function CogMenu({ onClose, setShowLanguageModal, logout, positio
                     </div>
                     <span>{t.gear_menu.language.title}</span>
                 </div>
+
+                <div className="group __menu-item pe-8 gap-1.5" onClick={adminAccount}>
+                    <div className="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" strokeWidth={1.5} className="size-4">
+                            <path d="M18.75 12.75h1.5a.75.75 0 0 0 0-1.5h-1.5a.75.75 0 0 0 0 1.5ZM12 6a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 12 6ZM12 18a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 12 18ZM3.75 6.75h1.5a.75.75 0 1 0 0-1.5h-1.5a.75.75 0 0 0 0 1.5ZM5.25 18.75h-1.5a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 0 1.5ZM3 12a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 3 12ZM9 3.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM12.75 12a2.25 2.25 0 1 1 4.5 0 2.25 2.25 0 0 1-4.5 0ZM9 15.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" />
+                        </svg>
+                    </div>
+                    <span>{t.gear_menu.adminAccount}</span>
+                </div>
+
                 <div className="h-px bg-gray-700 my-1 mx-4"></div>
-                <div className="group __menu-item pe-8 gap-1.5 text-red-600" onClick={logout}>
+
+                <div className="group __menu-item pe-8 gap-1.5" data-color="danger" onClick={logout}>
                     <div className="flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />

@@ -13,6 +13,7 @@ export const translations = {
         btn_cancel: "Cancel",
         btn_save: "Save",
       },
+      adminAccount: "Manage account",
     },
 
     auth: {
@@ -116,6 +117,7 @@ export const translations = {
         btn_cancel: "Cancelar",
         btn_save: "Guardar",
       },
+      adminAccount: "Administrar cuenta",
     },
 
     auth: {
