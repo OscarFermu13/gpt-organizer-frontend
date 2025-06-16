@@ -1,5 +1,6 @@
 import React from 'react';
 import { getTranslator } from '../../../lib/i18n.jsx';
+import { notifyError } from '../../../components/notificationProvider.jsx';
 
 const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
@@ -12,10 +13,15 @@ export default function ConfirmDeleteModal({ item, type, onClose }) {
                 method: 'DELETE',
                 credentials: 'include',
             });
-            window.dispatchEvent(new CustomEvent('folderUpdated'));
+
+            const msg = type === 'chat' ? t.success_messages.chat_deleted : t.success_messages.folder_deleted;
+
+            window.dispatchEvent(new CustomEvent('folderUpdated', {
+                detail: { msg: msg }
+            }));
             onClose();
         } catch (err) {
-            console.error('Error al eliminar:', err);
+            notifyError(t.error_messages.item_deleted);
         }
     };
 

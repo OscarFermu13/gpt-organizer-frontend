@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getTranslator } from '../../../lib/i18n.jsx';
+import { notifyError } from '../../notificationProvider.jsx';
 
 const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
@@ -19,10 +20,12 @@ export default function RenameFolderModal({ folder, onClose, setFolders }) {
             if (!res.ok) throw new Error('Error al renombrar la carpeta');
             const updatedFolder = await res.json();
             setFolders(prev => prev.map(f => f.id === folder.id ? updatedFolder : f));
-            window.dispatchEvent(new CustomEvent('folderUpdated'));
+            window.dispatchEvent(new CustomEvent('folderUpdated', {
+                detail: { msg: t.success_messages.folder_renamed }
+            }));
             onClose();
         } catch (err) {
-            console.error(err);
+            notifyError(t.error_messages.folder_renamed);
         }
     };
 

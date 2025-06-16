@@ -4,7 +4,7 @@ export const translations = {
     sidebar_extension_name: "GPT Organizer",
     sidebar_create_folder_btn: "Create folder",
     sidebar_loading_message: "Loading folders...",
-    
+
 
     gear_menu: {
       logout: "Logout",
@@ -24,6 +24,11 @@ export const translations = {
       btn_login: "Login",
       btn_register: "Create account",
       btn_cancel: "Cancel",
+    },
+
+    upgrade: {
+      btn_upgrade: "Upgrade",
+      message: "Your trial has ended:"
     },
 
     add_to_folder_modal: {
@@ -103,6 +108,35 @@ export const translations = {
       btn_delete: "Delete",
     },
 
+    success_messages: {
+      add_chat_to_folder: "Chat successfully added",
+      add_subfolder: "Folder successfully created",
+      update_folder_color: "Folder successfully updated",
+      folder_deleted: "Folder successfully deleted",
+      folder_created: "Folder successfully created",
+      chat_moved: "Chat successfully moved",
+      folder_moved: "Folder successfully moved",
+      chat_renamed: "Chat successfully renamed",
+      folder_renamed: "Folder successfully renamed",
+      chat_deleted: "Chat successfully deleted"
+    },
+
+    error_messages: {
+      add_chat_to_folder: "Failed to add chat",
+      add_subfolder: "Failed to create folder",
+      update_folder_color: "Failed to update folder",
+      item_deleted: "Failed to delete item",
+      folder_created: "Failed to create folder",
+      chat_moved: "Failed to move chat",
+      folder_moved: "Failed to move folder",
+      chat_renamed: "Failed to rename chat",
+      folder_renamed: "Failed to rename folder",
+
+      auth: "Authentication error",
+      fetch_folders: "Could not fetch folders",
+      upgrade: "Could not open page"
+    }
+
   },
   es: {
     sidebar_header: "Carpetas",
@@ -128,6 +162,11 @@ export const translations = {
       btn_login: "Iniciar sesión",
       btn_register: "Crear cuenta",
       btn_cancel: "Cancelar",
+    },
+
+    upgrade: {
+      btn_upgrade: "Actualiza",
+      message: "Tu periodo de prueba ha terminado:"
     },
 
     add_to_folder_modal: {
@@ -206,5 +245,35 @@ export const translations = {
       btn_cancel: "Cancelar",
       btn_delete: "Eliminar",
     },
+
+    success_messages: {
+      add_chat_to_folder: "Chat añadido correctamente",
+      add_subfolder: "Carpeta creada correctamente",
+      update_folder_color: "Carpeta actualizada correctamente",
+      folder_deleted: "Carpeta eliminada correctamente",
+      folder_created: "Carpeta creada correctamente",
+      chat_moved: "Chat movido correctamente",
+      folder_moved: "Carpeta movida correctamente",
+      chat_renamed: "Chat renombrado correctamente",
+      folder_renamed: "Carpeta renombrada correctamente",
+      chat_deleted: "Chat eliminado correctamente",
+      language_changed: "Idioma cambiado correctamente"
+    },
+
+    error_messages: {
+      add_chat_to_folder: "No se pudo añadir el chat",
+      add_subfolder: "No se pudo crear la carpeta",
+      update_folder_color: "No se pudo actualizar la carpeta",
+      item_deleted: "No se pudo eliminar el elemento",
+      folder_created: "No se pudo crear la carpeta",
+      chat_moved: "No se pudo mover el chat",
+      folder_moved: "No se pudo mover la carpeta",
+      chat_renamed: "No se pudo renombrar el chat",
+      folder_renamed: "No se pudo renombrar la carpeta",
+
+      auth: "Fallo de autenticación",
+      fetch_folders: "No se pudieron cargar las carpetas",
+      upgrade: "No se puedo abrir la página de pago"
+    }
   }
 };

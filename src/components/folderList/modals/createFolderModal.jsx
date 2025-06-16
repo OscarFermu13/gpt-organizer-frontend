@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import DefaultColorPalette from '../../DefaultColorPalette';
 import { getTranslator } from '../../../lib/i18n.jsx';
+import { notifyError } from '../../../components/notificationProvider.jsx';
+
 
 const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
@@ -22,10 +24,12 @@ export default function CreateFolderModal({ onClose, folders, setFolders }) {
             if (!res.ok) throw new Error('Error al crear carpeta');
             const newFolder = await res.json();
             setFolders([...folders, newFolder]);
-            window.dispatchEvent(new CustomEvent('folderUpdated'));
+            window.dispatchEvent(new CustomEvent('folderUpdated', {
+                detail: { msg: t.success_messages.folder_created }
+            }));
             onClose();
         } catch (err) {
-            console.error(err);
+            notifyError(t.error_messages.folder_created);
         }
     };
 

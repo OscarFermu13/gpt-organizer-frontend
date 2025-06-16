@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getTranslator } from '../lib/i18n.jsx';
+import { notifyError } from '../components/notificationProvider.jsx';
+
 
 const ListFoldersModal = ({ onClose }) => {
     const [folders, setFolders] = useState([]);
@@ -25,7 +27,7 @@ const ListFoldersModal = ({ onClose }) => {
                 const data = await res.json();
                 setFolders(data);
             } catch (err) {
-                console.error('Error al cargar carpetas:', err);
+                notifyError(t.error_messages.fetch_folders);
             } finally {
                 setLoading(false);
             }
@@ -53,13 +55,14 @@ const ListFoldersModal = ({ onClose }) => {
 
                 if (!res.ok) throw new Error(`Error: ${res.status}`);
 
-                const data = await res.json();
-                console.log('Chat añadido a la carpeta correctamente: ', data);
-                window.dispatchEvent(new CustomEvent('folderUpdated'));
+                window.dispatchEvent(new CustomEvent('folderUpdated', {
+                    detail: { msg: t.success_messages.add_chat_to_folder }
+                }));
                 onClose();
             }
         } catch (error) {
-            console.error('Error al añadir el chat a la carpeta: ', error);
+            notifyError(t.error_messages.add_chat_to_folder);
+            onClose();
         }
     };
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { notifySuccess, notifyError } from '../../notificationProvider';
 
 const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
@@ -25,7 +26,7 @@ export function useFolders() {
     }));
   };
 
-  const fetchFolders = async () => {
+  const fetchFolders = async (msg) => {
     try {
       setLoading(true);
       const res = await fetch(`${API_URL}/folders`, {
@@ -36,8 +37,9 @@ export function useFolders() {
       if (!res.ok) throw new Error(`Error ${res.status}`);
       const data = await res.json();
       setFolders(data);
+      notifySuccess(msg);
     } catch (err) {
-      console.error('Error al cargar carpetas:', err);
+      notifyError("Failed to fetch folders");
     } finally {
       setLoading(false);
     }
@@ -45,7 +47,10 @@ export function useFolders() {
 
   useEffect(() => {
     fetchFolders();
-    const handleUpdate = () => fetchFolders();
+    const handleUpdate = (event) => {
+      const msg = event.detail.msg !== null ? event.detail.msg : "Success";
+      fetchFolders(msg);
+    };
     window.addEventListener('folderUpdated', handleUpdate);
     return () => window.removeEventListener('folderUpdated', handleUpdate);
   }, []);

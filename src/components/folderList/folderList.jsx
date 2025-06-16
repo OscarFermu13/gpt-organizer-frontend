@@ -1,9 +1,10 @@
 // components/FolderList/FolderList.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFolders } from './hooks/useFolders';
 import FolderTree from './folderTree';
 import ContextMenu from './menus/contextMenu';
 import CogMenu from './menus/cogMenu';
+import NotificationProvider  from '../../components/notificationProvider';
 
 import CreateFolderModal from './modals/createFolderModal';
 import RenameFolderModal from './modals/renameFolderModal';
@@ -67,6 +68,8 @@ export default function FolderList() {
 
   return (
     <div className="mt-(--sidebar-section-margin-top)">
+
+      <NotificationProvider />
 
       {/* Header */}
       <div className="justify-between flex items-center gap-2 truncate">

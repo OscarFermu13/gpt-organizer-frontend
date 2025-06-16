@@ -1,5 +1,6 @@
 import React from 'react';
 import { getTranslator } from '../../../lib/i18n.jsx';
+import { notifyError } from '../../../components/notificationProvider.jsx';
 
 const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
@@ -14,10 +15,12 @@ export default function MoveChatModal({ chat, folders, onClose }) {
                 credentials: 'include',
                 body: JSON.stringify({ folderId }),
             });
-            window.dispatchEvent(new CustomEvent('folderUpdated'));
+            window.dispatchEvent(new CustomEvent('folderUpdated', {
+                detail: { msg: t.success_messages.chat_moved }
+            }));
             onClose();
         } catch (err) {
-            console.error(err);
+            notifyError(t.error_messages.chat_moved);
         }
     };
 

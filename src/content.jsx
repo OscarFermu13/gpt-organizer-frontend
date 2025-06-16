@@ -3,9 +3,10 @@ import React from 'react';
 import FolderList from './components/folderList/folderList';
 import CreateButton from './components/createButton';
 import AuthPanel from './components/authPanel';
+import UpgradePanel from './components/upgradePanel';
 import ChatToggle from './components/chatToggle';
 
-const API_URL = 'https://gpt-organizer-backend.onrender.com/auth';
+const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
 function waitForElement(selector, timeout = 10000) {
   return new Promise((resolve, reject) => {
@@ -88,23 +89,35 @@ function insertSidebarToggleComponent() {
       history.prepend(container);
       const root = createRoot(container);
 
-      const res = await fetch(`${API_URL}/validate`, {
+      const res = await fetch(`${API_URL}/auth/validate`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      const billingRes = await fetch(`${API_URL}/billing/status`, {
         method: 'GET',
         credentials: 'include',
       });
 
       const isAuthenticated = res.ok;
 
-      if (isAuthenticated)
-        root.render(<FolderList />);
-      else
+      const status = await billingRes.json();
+      const isFreeUser = status.plan === 'pro' ? false : true;
+      const trialEnded = new Date(status.trialEndsAt) < new Date();
+
+      if (isAuthenticated) {
+        if (isFreeUser && trialEnded)
+          root.render(<UpgradePanel />);
+        else
+          root.render(<FolderList />);
+      } else 
         root.render(<AuthPanel />);
 
       observeMenuOpen();
       insertSidebarToggleComponent();
     }
   } catch (error) {
-    console.error('GPT Organizer: Failed to inject FolderList', error);
+    console.error('GPT Organizer: Failed to inject');
   }
 })();
 

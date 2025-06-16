@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getTranslator } from '../lib/i18n.jsx';
+import { notifyError } from './notificationProvider.jsx';
 
 export default function AuthPanel() {
     const [showModal, setShowModal] = useState(false);
@@ -30,14 +31,11 @@ export default function AuthPanel() {
             });
 
             if (!res.ok) throw new Error('Error en la autenticación');
-            const data = await res.json();
 
-            console.log('Respuesta:', data);
             window.location.reload();
             setShowModal(false);
         } catch (err) {
-            console.error(err);
-            alert('Error al autenticar');
+            alert(t.error_messages.auth);
         }
     };
 

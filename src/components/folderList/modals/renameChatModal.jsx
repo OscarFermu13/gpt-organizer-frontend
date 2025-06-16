@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getTranslator } from '../../../lib/i18n.jsx';
+import { notifyError } from '../../../components/notificationProvider.jsx';
 
 const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
@@ -19,10 +20,12 @@ export default function RenameChatModal({ chat, onClose }) {
 
             if (!res.ok) throw new Error('Error al renombrar el chat');
 
-            window.dispatchEvent(new CustomEvent('folderUpdated'));
+            window.dispatchEvent(new CustomEvent('folderUpdated', {
+                detail: { msg: t.success_messages.chat_renamed }
+            }));
             onClose();
         } catch (err) {
-            console.error(err);
+            notifyError(t.error_messages.chat_renamed);
         }
     };
 

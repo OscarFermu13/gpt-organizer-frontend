@@ -1,5 +1,7 @@
 import React from 'react';
 import { getTranslator } from '../../../lib/i18n.jsx';
+import { notifyError, notifyWarning } from '../../notificationProvider.jsx';
+
 
 const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
@@ -8,17 +10,23 @@ const t = getTranslator();
 export default function MoveFolderModal({ folder, folders, onClose }) {
     const moveFolder = async (parentId) => {
         try {
-            if (folder.id === parentId) return;
+            if (folder.id === parentId) {
+                notifyWarning("No puedes mover la carpeta a si misma");
+                return;
+            }
+                
             await fetch(`${API_URL}/folders/${folder.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({ parentId }),
             });
-            window.dispatchEvent(new CustomEvent('folderUpdated'));
+            window.dispatchEvent(new CustomEvent('folderUpdated', {
+                detail: { msg: t.success_messages.folder_moved }
+            }));
             onClose();
         } catch (err) {
-            console.error(err);
+            notifyError(t.error_messages.folder_moved);
         }
     };
 
