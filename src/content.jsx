@@ -5,6 +5,7 @@ import CreateButton from './components/createButton';
 import AuthPanel from './components/authPanel';
 import UpgradePanel from './components/upgradePanel';
 import ChatToggle from './components/chatToggle';
+import ChatPanel from './components/starredMessages/chatPanel';
 
 const API_URL = 'https://gpt-organizer-backend.onrender.com';
 
@@ -66,7 +67,7 @@ function insertSidebarToggleComponent() {
   if (heading) heading.remove();
   if (!history || !folderList || !aside || document.getElementById('sidebar-toggle-wrapper')) return;
 
-  aside.classList.remove('mt-(--sidebar-section-margin-top)');
+  aside.classList.remove('pt-(--sidebar-section-margin-top)');
 
   // Crear contenedor
   const container = document.createElement('div');
@@ -76,6 +77,39 @@ function insertSidebarToggleComponent() {
   // Montar componente React
   const root = createRoot(container);
   root.render(<ChatToggle />);
+}
+
+let currentPath = window.location.pathname;
+
+function insertChatPanel() {
+  const thread = document.getElementById('thread');
+  if (!thread) return;
+
+  // Elimina el contenedor anterior si existe
+  const oldContainer = document.getElementById('gpt-organizer-chat-root');
+  if (oldContainer) oldContainer.remove();
+
+  // Crea e inserta el nuevo contenedor
+  const container = document.createElement('div');
+  container.id = 'gpt-organizer-chat-root';
+  thread.prepend(container);
+
+  const root = createRoot(container);
+  const chatId = window.location.pathname;
+  root.render(<ChatPanel chatId={chatId} />);
+}
+
+function monitorChatChanges() {
+  const observer = new MutationObserver(() => {
+    if (window.location.pathname !== currentPath) {
+      currentPath = window.location.pathname;
+      insertChatPanel();
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  insertChatPanel();
 }
 
 (async () => {
@@ -110,11 +144,12 @@ function insertSidebarToggleComponent() {
           root.render(<UpgradePanel />);
         else
           root.render(<FolderList />);
-      } else 
+      } else
         root.render(<AuthPanel />);
 
       observeMenuOpen();
       insertSidebarToggleComponent();
+      monitorChatChanges();
     }
   } catch (error) {
     console.error('GPT Organizer: Failed to inject');

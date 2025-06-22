@@ -108,6 +108,17 @@ export const translations = {
       btn_delete: "Delete",
     },
 
+    save_message_modal: {
+      header: "Saved messages",
+      no_messages: "No saved messages",
+      title: "Save message",
+      name_placeholder: "Message title",
+      btn_cancel: "Cancel",
+      btn_save: "Save",
+      delete_btn_title: "Delete saved message",
+      save_btn_title: "Save message"
+    },
+
     success_messages: {
       add_chat_to_folder: "Chat successfully added",
       add_subfolder: "Folder successfully created",
@@ -118,7 +129,9 @@ export const translations = {
       folder_moved: "Folder successfully moved",
       chat_renamed: "Chat successfully renamed",
       folder_renamed: "Folder successfully renamed",
-      chat_deleted: "Chat successfully deleted"
+      chat_deleted: "Chat successfully deleted",
+      message_saved: "Message successfully saved",
+      message_deleted: "Messaged successfully deleted"
     },
 
     error_messages: {
@@ -131,6 +144,8 @@ export const translations = {
       folder_moved: "Failed to move folder",
       chat_renamed: "Failed to rename chat",
       folder_renamed: "Failed to rename folder",
+      message_saved: "Failed to save message",
+      message_deleted: "Failed to delete message",
 
       auth: "Authentication error",
       fetch_folders: "Could not fetch folders",
@@ -246,6 +261,17 @@ export const translations = {
       btn_delete: "Eliminar",
     },
 
+    save_message_modal: {
+      header: "Mensajes guardados",
+      no_messages: "No hay mensajes guardados",
+      title: "Guardar mensaje",
+      name_placeholder: "Título del mensaje",
+      btn_cancel: "Cancelar",
+      btn_save: "Guardar",
+      delete_btn_title: "Eliminar mensaje guardado",
+      save_btn_title: "Guardar mensaje"
+    },
+
     success_messages: {
       add_chat_to_folder: "Chat añadido correctamente",
       add_subfolder: "Carpeta creada correctamente",
@@ -257,7 +283,9 @@ export const translations = {
       chat_renamed: "Chat renombrado correctamente",
       folder_renamed: "Carpeta renombrada correctamente",
       chat_deleted: "Chat eliminado correctamente",
-      language_changed: "Idioma cambiado correctamente"
+      language_changed: "Idioma cambiado correctamente",
+      message_saved: "Mensaje guardado correctamente",
+      message_deleted: "Mensaje eliminado correctamente"
     },
 
     error_messages: {
@@ -270,6 +298,8 @@ export const translations = {
       folder_moved: "No se pudo mover la carpeta",
       chat_renamed: "No se pudo renombrar el chat",
       folder_renamed: "No se pudo renombrar la carpeta",
+      message_saved: "No se pudo guardar el mensaje",
+      message_deleted: "No se pudo eliminar el mensaje",
 
       auth: "Fallo de autenticación",
       fetch_folders: "No se pudieron cargar las carpetas",

@@ -17,7 +17,6 @@ export default function ChatToggle() {
 
         if (!aside) return;
 
-
         aside.classList.toggle('hidden');
         const newHidden = aside.classList.contains('hidden');
         setHidden(newHidden);
@@ -26,7 +25,7 @@ export default function ChatToggle() {
 
     return (
         <div
-            className="mt-(--sidebar-section-margin-top) justify-between flex items-center gap-2 truncate hover:bg-gray-700 rounded cursor-pointer"
+            className="mt-2 justify-between flex items-center gap-2 truncate hover:bg-gray-700 rounded cursor-pointer"
             onClick={toggleSidebar}
         >
             <h6 className="__menu-label">Chats</h6>

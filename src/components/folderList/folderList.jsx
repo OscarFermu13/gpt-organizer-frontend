@@ -67,7 +67,7 @@ export default function FolderList() {
   if (loading) return <div className="m-4 text-white text-sm">{t.sidebar_loading_message}</div>;
 
   return (
-    <div className="mt-(--sidebar-section-margin-top)">
+    <div className="mt-2">
 
       <NotificationProvider />
 
