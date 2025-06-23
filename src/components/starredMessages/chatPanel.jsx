@@ -197,6 +197,26 @@ export default function ChatPanel({ chatId }) {
     updateButton();
   }, [isDrawerOpen]);
 
+  useEffect(() => {
+      const handleKeyDown = (e) => {
+        if (!showCreateModal) return;
+  
+        if (e.key === 'Escape') {
+          setShowCreateModal(false);
+        }
+  
+        if (e.key === 'Enter') {
+          const primaryButton = document.querySelector('.gpt-organizer-modal .btn-primary') || document.querySelector('.gpt-organizer-modal .btn-danger');
+          if (primaryButton) {
+            primaryButton.click();
+          }
+        }
+      };
+  
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [showCreateModal]);
+
   return (
     <>
       <ListStarredMessages
@@ -213,7 +233,7 @@ export default function ChatPanel({ chatId }) {
             className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]"
           >
             <div
-              className="p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
+              className="gpt-organizer-modal p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="pb-4 text-lg font-bold">{t.save_message_modal.title}</h2>

@@ -5,7 +5,7 @@ export default function ChatItem({ chat, depth, openContextMenu }) {
     <a
       className="group __menu-item gap-6 justify-between flex items-center"
       style={{ marginLeft: `${depth * 16}px` }}
-      href={`https://chatgpt.com/c/${chat.chatId}`}
+      href={`https://chatgpt.com/${chat.chatId}`}
     >
       <div class="flex min-w-0 grow items-center gap-2">
         <div class="truncate grow">

@@ -4,7 +4,7 @@ import { useFolders } from './hooks/useFolders';
 import FolderTree from './folderTree';
 import ContextMenu from './menus/contextMenu';
 import CogMenu from './menus/cogMenu';
-import NotificationProvider  from '../../components/notificationProvider';
+import NotificationProvider from '../../components/notificationProvider';
 
 import CreateFolderModal from './modals/createFolderModal';
 import RenameFolderModal from './modals/renameFolderModal';
@@ -21,6 +21,7 @@ import { getTranslator } from '../../lib/i18n.jsx';
 const API_URL = 'https://gpt-organizer-backend.onrender.com';
 const WEB_URL = 'http://localhost:3000/dashboard';
 
+const t = getTranslator();
 
 export default function FolderList() {
   const {
@@ -62,7 +63,37 @@ export default function FolderList() {
   const closeContextMenu = () => setContextMenu(null);
   const closeCogMenu = () => setCogMenuPos(null);
 
-  const t = getTranslator();
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const anyModalOpen = showCreateModal || Object.values(modalState).some(Boolean);
+      if (!anyModalOpen) return;
+
+      if (e.key === 'Escape') {
+        setShowCreateModal(false);
+        setModalState({
+          renameFolder: null,
+          moveFolder: null,
+          renameChat: null,
+          moveChat: null,
+          addSubfolder: null,
+          changeColor: null,
+          confirmDelete: null,
+          changeLang: false
+        });
+      }
+
+      if (e.key === 'Enter') {
+        const primaryButton = document.querySelector('.gpt-organizer-modal .btn-primary') || document.querySelector('.gpt-organizer-modal .btn-danger');
+        if (primaryButton) {
+          primaryButton.click();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCreateModal, modalState]);
+
 
   if (loading) return <div className="m-4 text-white text-sm">{t.sidebar_loading_message}</div>;
 

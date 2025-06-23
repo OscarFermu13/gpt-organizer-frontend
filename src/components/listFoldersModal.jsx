@@ -13,7 +13,7 @@ const ListFoldersModal = ({ onClose }) => {
     const t = getTranslator();
 
     const chatHref = sessionStorage.getItem("lastChatHref");
-    const chatId = chatHref?.split("/c/")[1] ?? null;
+    const chatId = chatHref?.match(/c\/.*$/)?.[0] ?? null;
     const chatTitle = sessionStorage.getItem("lastChatTitle") || "Chat sin título";
 
     useEffect(() => {
