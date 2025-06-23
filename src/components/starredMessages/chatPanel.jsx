@@ -7,6 +7,7 @@ const t = getTranslator();
 
 export default function ChatPanel({ chatId }) {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(null);
   const [title, setTitle] = useState('');
@@ -33,6 +34,8 @@ export default function ChatPanel({ chatId }) {
     if (msg) {
       await deleteMessage(msg.id);
     }
+    setShowDeleteModal(false);
+    setCurrentMessageIndex(0);
   };
 
   const handleScrollTo = (messageIndex) => {
@@ -40,14 +43,15 @@ export default function ChatPanel({ chatId }) {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const openModal = useCallback((messageIndex) => {
+  const openCreateModal = useCallback((messageIndex) => {
     setCurrentMessageIndex(messageIndex);
     setShowCreateModal(true);
   }, []);
 
-  const deleteMsg = useCallback((messageIndex) => {
-    handleDelete(messageIndex);
-  }, [handleDelete]);
+  const openDeleteModal = useCallback((messageIndex) => {
+    setCurrentMessageIndex(messageIndex);
+    setShowDeleteModal(true);
+  }, []);
 
   const updateButtons = useCallback(() => {
     if (isUpdatingRef.current) return;
@@ -107,11 +111,8 @@ export default function ChatPanel({ chatId }) {
   const updateButtonState = (btn, isSaved, index) => {
     btn.title = isSaved ? t.save_message_modal.delete_btn_title : t.save_message_modal.save_btn_title;
     btn.onclick = isSaved
-      ? () => deleteMsg(index)
-      : () => {
-        openModal(index);
-        console.log("test");
-      };
+      ? () => openDeleteModal(index)
+      : () => openCreateModal(index);
 
     let span = btn.querySelector('span');
     if (!span) {
@@ -172,12 +173,12 @@ export default function ChatPanel({ chatId }) {
     if (!container) return;
 
     let btn = container.querySelector('.gpt-organizer-open-messages-btn');
-    
+
     if (!btn) {
       btn = document.createElement('button');
       span = document.createElement('span');
       span.className = 'flex h-6 w-6 items-center justify-center';
-        
+
       span.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
           <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
@@ -198,24 +199,24 @@ export default function ChatPanel({ chatId }) {
   }, [isDrawerOpen]);
 
   useEffect(() => {
-      const handleKeyDown = (e) => {
-        if (!showCreateModal) return;
-  
-        if (e.key === 'Escape') {
-          setShowCreateModal(false);
+    const handleKeyDown = (e) => {
+
+      if (e.key === 'Escape') {
+        setShowCreateModal(false);
+        setShowDeleteModal(false);
+      }
+
+      if (e.key === 'Enter') {
+        const primaryButton = document.querySelector('.gpt-organizer-modal .btn-primary') || document.querySelector('.gpt-organizer-modal .btn-danger');
+        if (primaryButton) {
+          primaryButton.click();
         }
-  
-        if (e.key === 'Enter') {
-          const primaryButton = document.querySelector('.gpt-organizer-modal .btn-primary') || document.querySelector('.gpt-organizer-modal .btn-danger');
-          if (primaryButton) {
-            primaryButton.click();
-          }
-        }
-      };
-  
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [showCreateModal]);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCreateModal]);
 
   return (
     <>
@@ -224,7 +225,7 @@ export default function ChatPanel({ chatId }) {
         onClose={() => setDrawerOpen(false)}
         savedMessages={savedMessages}
         onSelect={handleScrollTo}
-        onDelete={deleteMessage}
+        onDelete={openDeleteModal}
       />
 
       {showCreateModal && (
@@ -253,11 +254,36 @@ export default function ChatPanel({ chatId }) {
                     handleSave(currentMessageIndex, title);
                     setShowCreateModal(false);
                     setTitle('');
+                    setCurrentMessageIndex(0);
                   }}
                   className="btn relative btn-primary ms-4 me-0 mt-0 rounded-full px-4 py-1 text-base font-bold sm:py-3"
                   disabled={!title.trim()}>
                   {t.save_message_modal.btn_save}
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 dark:bg-black/80"
+          onClick={() => setShowDeleteModal(false)}
+        >
+          <div className="z-50 h-full w-full overflow-y-auto grid grid-cols-[10px_1fr_10px] grid-rows-[minmax(10px,1fr)_auto_minmax(10px,1fr)] md:grid-rows-[minmax(20px,1fr)_auto_minmax(20px,1fr)]">
+            <div
+              className="gpt-organizer-modal p-4 sm:p-6 popover bg-token-main-surface-primary relative start-1/2 col-auto col-start-2 row-auto row-start-2 h-full w-full text-start ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-2xl shadow-xl flex flex-col focus:outline-hidden overflow-hidden max-w-[550px]"
+              onClick={e => e.stopPropagation()}
+            >
+              <h2 className="text-lg font-bold mb-4">{t.delete_message_modal.title}</h2>
+
+              <div className='h-px bg-gray-700 my-1'></div>
+              <p className="my-4">{t.delete_message_modal.message}</p>
+
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setShowDeleteModal(false)} className="btn btn-secondary">{t.delete_message_modal.btn_cancel}</button>
+                <button onClick={() => handleDelete(currentMessageIndex)} className="btn btn-danger">{t.delete_message_modal.btn_delete}</button>
               </div>
             </div>
           </div>

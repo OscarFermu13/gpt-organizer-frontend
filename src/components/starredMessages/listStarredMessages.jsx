@@ -38,7 +38,7 @@ export default function SavedMessagesDrawer({ isOpen, onClose, savedMessages, on
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      onDelete(msg.id);
+                      onDelete(msg.messageIndex);
                     }}
                     className="text-danger"
                   >

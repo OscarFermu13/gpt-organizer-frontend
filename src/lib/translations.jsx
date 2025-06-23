@@ -119,6 +119,13 @@ export const translations = {
       save_btn_title: "Save message"
     },
 
+    delete_message_modal: {
+      title: "Delete message?",
+      message: "This will delete the message permanently",
+      btn_cancel: "Cancel",
+      btn_delete: "Save",
+    },
+
     success_messages: {
       add_chat_to_folder: "Chat successfully added",
       add_subfolder: "Folder successfully created",
@@ -270,6 +277,13 @@ export const translations = {
       btn_save: "Guardar",
       delete_btn_title: "Eliminar mensaje guardado",
       save_btn_title: "Guardar mensaje"
+    },
+
+    delete_message_modal: {
+      title: "¿Eliminar mensaje?",
+      message: "Esto eliminará el mensaje permanentemente",
+      btn_cancel: "Cancelar",
+      btn_delete: "Eliminar",
     },
 
     success_messages: {
